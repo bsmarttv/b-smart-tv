@@ -817,6 +817,7 @@ function HomeContent() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [locale, pathname, router]);
 
+  // 🎯 تم توحيد روابط الفيديوهات بجودة mp4 من Cloudinary في اللغتين لضمان تشغيلها طيارة
   const slides = locale === 'en' ? [
     {
       id: 1,
@@ -841,19 +842,19 @@ function HomeContent() {
       id: 1,
       h1: <>Meilleur abonnement <span className="text-[#3B82F6]">IPTV 2026</span> <br/> Regardez la télévision en direct, des <br/>films et du sport en HD</>,
       p: <>Profitez d'un streaming <span className="text-[#3B82F6]">4K</span> ultra-fluide et <span className="text-[#3B82F6]">sans coupure</span> sur tous vos appareils, où que vous soyez.</>,
-      tag: "TV-EU", video: "/videos/slide1.mp4"
+      tag: "TV-EU", video: "https://res.cloudinary.com/ddskjurfk/video/upload/v1780506742/watching-tv_1_b31ym6.mp4"
     },
     {
       id: 2,
       h1: <>Les derniers films<br/> et séries à la une !</>,
       p: "Avec Strong IPTV, plongez dans un divertissement sans limite : plus de 28 000 chaînes en direct et un catalogue riche de 200 000 films et séries du monde entier, le tout avec une stabilité 100 % garantie.",
-      tag: "TV-EU", video: "/videos/slide2.mp4"
+      tag: "TV-EU", video: "https://res.cloudinary.com/ddskjurfk/video/upload/v1780506742/watching-tv_1_b31ym6.mp4"
     },
     {
       id: 3,
       h1: <>Laissez la magie opérer :<br/> l'expérience IPTV ultime.</>,
       p: "Voyagez à travers le monde avec notre selection exceptionnelle de chaînes internationales. Un univers de divertissement sans limite, pensé pour satisfaire toutes vos envies",
-      tag: "TV-EU", video: "/videos/slide3.mp4"
+      tag: "TV-EU", video: "https://res.cloudinary.com/ddskjurfk/video/upload/v1780506742/watching-tv_1_b31ym6.mp4"
     }
   ];
 
@@ -987,9 +988,6 @@ function HomeContent() {
         </div>
 
         <header className="relative w-full overflow-hidden min-h-[650px] flex items-center">
-          <button onClick={() => setIsMuted(prev => !prev)} className="absolute bottom-10 right-10 z-[80] p-4 bg-black/60 backdrop-blur-xl border border-white/20 rounded-full hover:bg-[#3B82F6] transition-all active:scale-95 shadow-2xl cursor-pointer pointer-events-auto">
-            <span className="text-2xl">{isMuted ? "🔇" : "🔊"}</span>
-          </button>
           <div className="absolute inset-y-0 left-0 right-0 z-[80] pointer-events-none">
             {currentSlide > 0 && (
               <button onClick={prevSlide} className="absolute left-0 top-1/2 -translate-y-1/2 h-24 w-6 flex items-center justify-center bg-black/40 backdrop-blur-md border border-white/20 hover:bg-[#3B82F6] pointer-events-auto cursor-pointer rounded-r-lg transition-all">
@@ -1007,37 +1005,53 @@ function HomeContent() {
               <div key={slide.id} className="w-full flex-shrink-0 relative min-h-[650px] flex items-center px-8 md:px-24">
                 <div className="absolute inset-0 -z-20 w-full h-full overflow-hidden">
                   <div className="absolute inset-0 bg-[#050505]"></div>
-                 <video 
-  ref={(el) => { videoRefs.current[index] = el; }} 
-  key={slide.video} 
-  src={slide.video} // ديريكت الرابط هنا باش يقرا صيغة Cloudinary كيفما كانت
-  loop 
-  playsInline 
-  autoPlay // 👈 زدنا هادي بـ P كبيرة باش يخدم أوتوماتيك ف المتصفحات
-  muted={true} // 👈 رديناها صامتة 100% ديما ف الخلفية باش الكروم والـ Safari ما ييبلوكيوهاش كاع
-  className="w-full h-full object-cover opacity-50"
-/>
+                  <video 
+                    ref={(el) => { videoRefs.current[index] = el; }} 
+                    key={slide.video} 
+                    src={slide.video} 
+                    loop 
+                    playsInline 
+                    autoPlay 
+                    muted={isMuted} // 👈 يتبع الـ state لتفعيل وإلغاء الصوت
+                    className="w-full h-full object-cover opacity-50"
+                  />
                   <div className="absolute inset-0 bg-gradient-to-r from-[#050505] via-[#050505]/40 to-transparent"></div>
                 </div>
                 <div className="relative z-10 max-w-4xl">
                   <h1 className="text-white text-2xl md:text-4xl font-black leading-[1.1] mb-6 tracking-tight uppercase">{slide.h1}</h1>
-                  <div className="flex items-center space-x-4 mb-6 text-sm font-medium">
-                    <span className="text-yellow-400 font-bold text-lg">⭐ 8.5</span>
+                  
+                  {/* 🎯 تم تعديل الـ Spacing والـ flex د هاد السطر باش ما يتخربقش ف التليفون */}
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 mb-6 text-sm font-medium">
+                    <span className="text-yellow-400 font-bold text-base md:text-lg whitespace-nowrap">⭐ 8.5</span>
                     <span className="text-[#94A3B8]">•</span>
-                    <span className="text-[#FFF] font-bold text-lg">2026</span>
+                    <span className="text-[#FFF] font-bold text-base md:text-lg whitespace-nowrap">2026</span>
                     <span className="text-[#94A3B8]">•</span>
-                    <span className="text-[#FFF] font-bold text-lg">{locale === 'en' ? 'Free Update' : 'Mise a jour gratuite'}</span>
-                    <span className="bg-[#3B82F6]/10 text-[#3B82F6] px-3 py-1 rounded-md border border-[#3B82F6]/20 font-bold uppercase text-[10px]">{slide.tag}</span>
+                    <span className="text-[#FFF] font-bold text-base md:text-lg whitespace-nowrap">{locale === 'en' ? 'Free Update' : 'Mise a jour gratuite'}</span>
+                    <span className="bg-[#3B82F6]/10 text-[#3B82F6] px-3 py-1 rounded-md border border-[#3B82F6]/20 font-bold uppercase text-[10px] ml-1">{slide.tag}</span>
                   </div>
-                  <div className="max-w-2xl mb-12">
+                  
+                  <div className="max-w-2xl mb-8">
                     <p className="text-[#94A3B8] text-sm md:text-base font-medium leading-relaxed">{slide.p}</p>
                   </div>
-                  <button 
-                    onClick={() => window.open("https://wa.me/212600000000", "_blank")}
-                    className="text-white px-6 py-5 rounded-xl font-black cursor-pointer shadow-xl active:scale-95 transition-all duration-500 hover:scale-105 bg-gradient-to-r from-[#3B82F6] via-[#1e3a8a] to-[#3B82F6] bg-[length:200%_auto] hover:bg-[position:right_center] uppercase text-xs tracking-wider"
-                  >
-                    {locale === 'en' ? 'Subscribe Now' : "S'abonner maintenant"}
-                  </button>
+
+                  {/* 🎯 بوطونة الصوت وبوطونة الاشتراك مجموعين بشكل متناسق في نفس المكان */}
+                  <div className="flex items-center gap-4">
+                    <button 
+                      onClick={() => window.open("https://wa.me/212600000000", "_blank")}
+                      className="text-white px-6 py-4 rounded-xl font-black cursor-pointer shadow-xl active:scale-95 transition-all duration-500 hover:scale-105 bg-gradient-to-r from-[#3B82F6] via-[#1e3a8a] to-[#3B82F6] bg-[length:200%_auto] hover:bg-[position:right_center] uppercase text-xs tracking-wider"
+                    >
+                      {locale === 'en' ? 'Subscribe Now' : "S'abonner maintenant"}
+                    </button>
+                    
+                    {/* 🔊 أيقونة الصوت متموضعة بنقاء هنا حدا البوطونة ديريكت ومريحة للشوفة */}
+                    <button 
+                      onClick={() => setIsMuted(prev => !prev)} 
+                      className="p-3.5 bg-black/60 backdrop-blur-xl border border-white/20 rounded-xl hover:bg-[#3B82F6] transition-all active:scale-95 shadow-xl cursor-pointer"
+                    >
+                      <span className="text-xl flex items-center justify-center h-5 w-5">{isMuted ? "🔇" : "🔊"}</span>
+                    </button>
+                  </div>
+
                 </div>
               </div>
             ))}
