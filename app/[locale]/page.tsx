@@ -822,19 +822,19 @@ function HomeContent() {
       id: 1,
       h1: <>Best <span className="text-[#3B82F6]">IPTV Subscription 2026</span> <br/> Watch Live TV, Movies and Sports in HD</>,
       p: <>Enjoy an ultra-smooth <span className="text-[#3B82F6]">4K</span> streaming and <span className="text-[#3B82F6]">buffer-free</span> experience on all your devices, wherever you are.</>,
-      tag: "TV-EU", video: "https://res.cloudinary.com/ddskjurfk/video/upload/v1780445850/watched-sports_jo63zl.mp4"
+      tag: "TV-EU", video: "https://res.cloudinary.com/ddskjurfk/video/upload/v1780506742/watching-tv_1_b31ym6.mp4"
     },
     {
       id: 2,
       h1: <>The Latest Featured<br/> Movies & Series!</>,
       p: "With Strong IPTV, dive into limitless entertainment: over 28,000 live channels and a rich catalog of 200,000 movies and series worldwide, with 100% guaranteed stability.",
-      tag: "TV-EU", video: "/videos/watched-series.webm"
+      tag: "TV-EU", video: "https://res.cloudinary.com/ddskjurfk/video/upload/v1780506742/watching-tv_1_b31ym6.mp4"
     },
     {
       id: 3,
       h1: <>Let the Magic Happen:<br/> The Ultimate IPTV Experience.</>,
       p: "Travel the world with our exceptional selection of international channels. A universe of endless entertainment, designed to satisfy all your desires.",
-      tag: "TV-EU", video: "/videos/slide3.mp4"
+      tag: "TV-EU", video: "https://res.cloudinary.com/ddskjurfk/video/upload/v1780506742/watching-tv_1_b31ym6.mp4"
     }
   ] : [
     {
@@ -1007,14 +1007,14 @@ function HomeContent() {
               <div key={slide.id} className="w-full flex-shrink-0 relative min-h-[650px] flex items-center px-8 md:px-24">
                 <div className="absolute inset-0 -z-20 w-full h-full overflow-hidden">
                   <div className="absolute inset-0 bg-[#050505]"></div>
-                  <video 
+                 <video 
   ref={(el) => { videoRefs.current[index] = el; }} 
   key={slide.video} 
-  src={slide.video} // 👈 ردينا الرابط ديريكت هنايا
+  src={slide.video} // ديريكت الرابط هنا باش يقرا صيغة Cloudinary كيفما كانت
   loop 
   playsInline 
-  autoPlay // 👈 تـأكد تزيد هادي إيلا بغيتيه يخدم بوحدو ف الخلفية
-  muted={isMuted || currentSlide !== index} 
+  autoPlay // 👈 زدنا هادي بـ P كبيرة باش يخدم أوتوماتيك ف المتصفحات
+  muted={true} // 👈 رديناها صامتة 100% ديما ف الخلفية باش الكروم والـ Safari ما ييبلوكيوهاش كاع
   className="w-full h-full object-cover opacity-50"
 />
                   <div className="absolute inset-0 bg-gradient-to-r from-[#050505] via-[#050505]/40 to-transparent"></div>
