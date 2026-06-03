@@ -822,7 +822,7 @@ function HomeContent() {
       id: 1,
       h1: <>Best <span className="text-[#3B82F6]">IPTV Subscription 2026</span> <br/> Watch Live TV, Movies and Sports in HD</>,
       p: <>Enjoy an ultra-smooth <span className="text-[#3B82F6]">4K</span> streaming and <span className="text-[#3B82F6]">buffer-free</span> experience on all your devices, wherever you are.</>,
-      tag: "TV-EU", video: "/videos/slide1.mp4"
+      tag: "TV-EU", video: "/videos/watched-sports.webm"
     },
     {
       id: 2,
