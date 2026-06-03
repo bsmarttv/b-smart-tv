@@ -822,7 +822,7 @@ function HomeContent() {
       id: 1,
       h1: <>Best <span className="text-[#3B82F6]">IPTV Subscription 2026</span> <br/> Watch Live TV, Movies and Sports in HD</>,
       p: <>Enjoy an ultra-smooth <span className="text-[#3B82F6]">4K</span> streaming and <span className="text-[#3B82F6]">buffer-free</span> experience on all your devices, wherever you are.</>,
-      tag: "TV-EU", video: "/videos/watched-sports.webm"
+      tag: "TV-EU", video: "https://res.cloudinary.com/ddskjurfk/video/upload/v1780445850/watched-sports_jo63zl.mp4"
     },
     {
       id: 2,
@@ -1007,9 +1007,16 @@ function HomeContent() {
               <div key={slide.id} className="w-full flex-shrink-0 relative min-h-[650px] flex items-center px-8 md:px-24">
                 <div className="absolute inset-0 -z-20 w-full h-full overflow-hidden">
                   <div className="absolute inset-0 bg-[#050505]"></div>
-                  <video ref={(el) => { videoRefs.current[index] = el; }} key={slide.video} loop playsInline muted={isMuted || currentSlide !== index} className="w-full h-full object-cover opacity-50">
-                    <source src={slide.video} type="video/mp4" />
-                  </video>
+                  <video 
+  ref={(el) => { videoRefs.current[index] = el; }} 
+  key={slide.video} 
+  src={slide.video} // 👈 ردينا الرابط ديريكت هنايا
+  loop 
+  playsInline 
+  autoPlay // 👈 تـأكد تزيد هادي إيلا بغيتيه يخدم بوحدو ف الخلفية
+  muted={isMuted || currentSlide !== index} 
+  className="w-full h-full object-cover opacity-50"
+/>
                   <div className="absolute inset-0 bg-gradient-to-r from-[#050505] via-[#050505]/40 to-transparent"></div>
                 </div>
                 <div className="relative z-10 max-w-4xl">
