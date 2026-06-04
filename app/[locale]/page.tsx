@@ -7,7 +7,7 @@ import Link from 'next/link';
 // ─── UNIFIED SECTION (SLIDER + IMAGE ON THE RIGHT) ───
 function UnifiedSection() {
   const params = useParams();
-  const locale = params?.locale || 'fr';
+  const locale = (params?.locale as string) || 'fr';
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
 
@@ -36,7 +36,7 @@ function UnifiedSection() {
       <div className="flex flex-col lg:flex-row items-center gap-8 pr-6 lg:pr-16 pl-0 w-full transform-gpu isolate">
         
         <div className="w-full lg:w-1/2 flex items-center overflow-hidden transform-gpu backface-hidden">
-          <DraggableSlider items={postersData} variant="four-posters" speed={0.5} />
+          <DraggableSlider items={postersData} variant="four-posters" />
         </div>
 
         <div className="w-full lg:w-1/2 flex flex-col justify-between gap-4 lg:h-[280px] py-2 transform-gpu">
@@ -67,33 +67,170 @@ function UnifiedSection() {
     </section>
   );
 }
+// ─── DRAGGABLE SLIDER COMPONENT (PERFECTLY SPACED GLOWING SLIDERS) ───
 
-// ─── DRAGGABLE SLIDER COMPONENT ───
 interface DraggableSliderProps {
   items: string[];
   variant?: "four-posters" | "mini-poster" | "poster" | "default" | "clean-logo" | "logo";
   direction?: "left" | "right";
-  speed?: number;
-  pauseDuration?: number;
-  type?: string;
 }
+
 function DraggableSlider({
   items,
   variant = "default",
-  direction = "left",
-  speed = 1,
-  pauseDuration = 2000
+  direction = "left"
 }: DraggableSliderProps) {
   const sliderRef = useRef<HTMLDivElement>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [scrollLeft, setScrollLeft] = useState(0);
-
   const currentVariant = variant as string;
   const isCleanLogo = currentVariant === "clean-logo" || currentVariant === "clean_logo" || currentVariant === "cleanLogo";
   const isLogoType = currentVariant === "logo" || isCleanLogo;
 
-  const displayItems = Array(6).fill(items).flat();
+  const displayItems = isLogoType ? [...items, ...items, ...items] : [...items, ...items, ...items, ...items, ...items, ...items];
+
+  useEffect(() => {
+    if (isLogoType || !sliderRef.current) return;
+    
+    const slider = sliderRef.current;
+    let timer: ReturnType<typeof setInterval>;
+    let animationFrame: number;
+    let isInteracting = false;
+    let isAnimating = false;
+
+    let isDragging = false;
+    let startX = 0;
+    let scrollLeftStart = 0;
+
+    const startAutoPlay = () => {
+      timer = setInterval(() => {
+        if (!slider || slider.children.length < 2 || isInteracting || isAnimating || isDragging) return;
+        
+        isAnimating = true;
+        
+        const firstCard = slider.children[0] as HTMLElement;
+        const secondCard = slider.children[1] as HTMLElement;
+        const stepSize = secondCard.offsetLeft - firstCard.offsetLeft;
+
+        const maxScroll = slider.scrollWidth / 2;
+        if (slider.scrollLeft >= maxScroll) {
+          slider.style.scrollBehavior = 'auto';
+          slider.scrollLeft = slider.scrollLeft - maxScroll;
+        }
+
+        const startScroll = slider.scrollLeft;
+        const targetScroll = startScroll + stepSize;
+
+        const duration = 900;
+        const startTime = performance.now();
+
+        slider.style.scrollSnapType = 'none';
+
+        const easeInOutQuart = (t: number) => {
+          return t < 0.5 ? 8 * t * t * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2;
+        };
+
+        const animateScroll = (currentTime: number) => {
+          if (isInteracting || isDragging) {
+            isAnimating = false;
+            slider.style.scrollSnapType = 'x mandatory';
+            return;
+          }
+
+          const timeElapsed = currentTime - startTime;
+          let progress = timeElapsed / duration;
+          if (progress > 1) progress = 1;
+
+          slider.scrollLeft = startScroll + (targetScroll - startScroll) * easeInOutQuart(progress);
+
+          if (progress < 1) {
+            animationFrame = requestAnimationFrame(animateScroll);
+          } else {
+            slider.style.scrollSnapType = 'x mandatory';
+            isAnimating = false;
+          }
+        };
+
+        animationFrame = requestAnimationFrame(animateScroll);
+      }, 2500);
+    };
+
+    startAutoPlay();
+
+    const getPageX = (e: MouseEvent | TouchEvent): number => {
+      if ('pageX' in e) return e.pageX;
+      if (e.touches && e.touches.length > 0) return e.touches[0].pageX;
+      if (e.changedTouches && e.changedTouches.length > 0) return e.changedTouches[0].pageX;
+      return 0;
+    };
+
+    const dragStart = (e: MouseEvent | TouchEvent) => {
+      isDragging = true;
+      isInteracting = true;
+      clearInterval(timer);
+      cancelAnimationFrame(animationFrame);
+      
+      slider.style.scrollSnapType = 'none';
+      
+      const maxScroll = slider.scrollWidth / 2;
+      if (slider.scrollLeft >= maxScroll) {
+        slider.scrollLeft = slider.scrollLeft - maxScroll;
+      } else if (slider.scrollLeft <= 0) {
+        slider.scrollLeft = maxScroll;
+      }
+
+      startX = getPageX(e);
+      scrollLeftStart = slider.scrollLeft;
+    };
+
+    const dragMove = (e: MouseEvent | TouchEvent) => {
+      if (!isDragging) return;
+      const currentX = getPageX(e);
+      const walk = (currentX - startX) * 1.5; 
+      slider.scrollLeft = scrollLeftStart - walk;
+    };
+
+    const dragEnd = () => {
+      if (!isDragging) return;
+      isDragging = false;
+      isInteracting = false;
+
+      if (slider.children.length >= 2) {
+        const firstCard = slider.children[0] as HTMLElement;
+        const secondCard = slider.children[1] as HTMLElement;
+        const stepSize = secondCard.offsetLeft - firstCard.offsetLeft;
+        
+        const closestStep = Math.round(slider.scrollLeft / stepSize);
+        slider.style.scrollBehavior = 'smooth';
+        slider.scrollLeft = closestStep * stepSize;
+        
+        setTimeout(() => {
+          slider.style.scrollSnapType = 'x mandatory';
+          slider.style.scrollBehavior = 'auto';
+        }, 300);
+      }
+
+      startAutoPlay();
+    };
+
+    slider.addEventListener('mousedown', dragStart);
+    window.addEventListener('mousemove', dragMove);
+    window.addEventListener('mouseup', dragEnd);
+
+    slider.addEventListener('touchstart', dragStart, { passive: true });
+    slider.addEventListener('touchmove', dragMove, { passive: true });
+    slider.addEventListener('touchend', dragEnd, { passive: true });
+
+    return () => {
+      clearInterval(timer);
+      cancelAnimationFrame(animationFrame);
+      slider.removeEventListener('mousedown', dragStart);
+      window.removeEventListener('mousemove', dragMove);
+      window.removeEventListener('mouseup', dragEnd);
+      
+      slider.removeEventListener('touchstart', dragStart);
+      slider.removeEventListener('touchmove', dragMove);
+      slider.removeEventListener('touchend', dragEnd);
+    };
+  }, [isLogoType]);
 
   const getCleanSrc = (item: any) => {
     if (!item) return "";
@@ -107,171 +244,77 @@ function DraggableSlider({
     return hasExtension ? `/posters/${itemStr}` : `/posters/${itemStr}.jpg`;
   };
 
-  useEffect(() => {
-    const slider = sliderRef.current;
-    if (!slider || !isLogoType || isDragging) return;
-
-    let animationFrameId: number;
-    let lastTime = performance.now();
-
-    const scroll = (time: number) => {
-      if (!slider || isDragging) return;
-      
-      const delta = (time - lastTime) / 16;
-      lastTime = time;
-
-      if (direction === "right") {
-        slider.scrollLeft -= speed * delta;
-        if (slider.scrollLeft <= 0) slider.scrollLeft = slider.scrollWidth / 3;
-      } else {
-        slider.scrollLeft += speed * delta;
-        if (slider.scrollLeft >= (slider.scrollWidth * 2) / 3) slider.scrollLeft = slider.scrollWidth / 3;
-      }
-
-      animationFrameId = requestAnimationFrame(scroll);
-    };
-
-    animationFrameId = requestAnimationFrame(scroll);
-    return () => cancelAnimationFrame(animationFrameId);
-  }, [isDragging, isLogoType, speed, direction]);
-
-  useEffect(() => {
-    const slider = sliderRef.current;
-    if (!slider || isDragging || isLogoType) return;
-
-    let timerId: NodeJS.Timeout;
-    let animationFrameId: number;
-
-    const performSnap = () => {
-      if (!slider || isDragging) return;
-      const card = slider.querySelector('.flex-shrink-0');
-      if (!card) return;
-
-      const style = window.getComputedStyle(card);
-      const margin = parseFloat(style.marginLeft) + parseFloat(style.marginRight) || 8;
-      const cardWidth = Math.round(card.getBoundingClientRect().width + margin);
-
-      const start = slider.scrollLeft;
-      const currentCardIndex = Math.round(start / cardWidth);
-      const targetScroll = (currentCardIndex + 1) * cardWidth;
-      const change = targetScroll - start;
-
-      let animationStart = performance.now();
-      const animDuration = 600;
-
-      const snapStep = (timestamp: number) => {
-        if (isDragging) return;
-        const elapsed = timestamp - animationStart;
-        const progress = Math.min(elapsed / animDuration, 1);
-
-        const ease = progress < 0.5 
-          ? 2 * progress * progress 
-          : -1 + (4 - 2 * progress) * progress;
-
-        if (slider) slider.scrollLeft = start + change * ease;
-
-        if (progress < 1) {
-          animationFrameId = requestAnimationFrame(snapStep);
-        } else {
-          const maxScroll = slider.scrollWidth - slider.clientWidth;
-          if (slider && (slider.scrollLeft >= slider.scrollWidth / 2 || slider.scrollLeft >= maxScroll - 4)) {
-            slider.scrollLeft = 0;
-          }
-          timerId = setTimeout(performSnap, pauseDuration);
-        }
-      };
-      animationFrameId = requestAnimationFrame(snapStep);
-    };
-    timerId = setTimeout(performSnap, pauseDuration);
-    return () => { clearTimeout(timerId); cancelAnimationFrame(animationFrameId); };
-  }, [isDragging, isLogoType, pauseDuration]);
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true);
-    if (sliderRef.current) {
-      setStartX(e.pageX - sliderRef.current.offsetLeft);
-      setScrollLeft(sliderRef.current.scrollLeft);
-    }
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging || !sliderRef.current) return;
-    e.preventDefault();
-    const x = e.pageX - sliderRef.current.offsetLeft;
-    const walk = (x - startX) * 1.5; 
-    sliderRef.current.scrollLeft = scrollLeft - walk;
-  };
-
-  const handleMouseUpOrLeave = () => {
-    setIsDragging(false);
-  };
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setIsDragging(true);
-    if (sliderRef.current && e.touches[0]) {
-      setStartX(e.touches[0].pageX - sliderRef.current.offsetLeft);
-      setScrollLeft(sliderRef.current.scrollLeft);
-    }
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging || !sliderRef.current || !e.touches[0]) return;
-    const x = e.touches[0].pageX - sliderRef.current.offsetLeft;
-    const walk = (x - startX) * 1.2;
-    sliderRef.current.scrollLeft = scrollLeft - walk;
-  };
-
   return (
-    <div className="w-full overflow-hidden bg-transparent">
-      <div
-        ref={sliderRef}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUpOrLeave}
-        onMouseLeave={handleMouseUpOrLeave}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleMouseUpOrLeave}
-        onTouchMove={handleTouchMove}
-        className="flex items-center overflow-x-auto scrollbar-none whitespace-nowrap py-2 cursor-grab active:cursor-grabbing w-full select-none transform-gpu"
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-      >
-        {displayItems.map((item, index) => {
-          let cardClass = "";
-          
-          if (isCleanLogo) {
-            cardClass = "mx-3 w-20 h-12 flex-shrink-0 flex items-center justify-center bg-transparent";
-          } else if (currentVariant === "logo") {
-            cardClass = "mx-2 w-16 h-16 md:w-20 md:h-20 lg:w-[85px] lg:h-[85px] flex-shrink-0 border border-[#3B82F6] rounded-2xl p-2 bg-white/5 flex items-center justify-center shadow-[0_0_10px_rgba(59,130,246,0.3)] transform-gpu";
-          } else if (currentVariant === "four-posters") {
-            cardClass = "mx-1 w-32 h-48 md:w-40 md:h-56 lg:w-48 lg:h-64 flex-shrink-0 rounded-xl overflow-hidden border border-[#3B82F6]/70 shadow-[0_0_8px_rgba(59,130,246,0.2)] transform-gpu";
-          } else if (currentVariant === "mini-poster") {
-            cardClass = "mx-2 w-32 h-48 md:w-44 md:h-64 lg:w-[240px] lg:h-[360px] flex-shrink-0 rounded-xl overflow-hidden border border-[#3B82F6] shadow-[0_0_12px_rgba(59,130,246,0.4)] transform-gpu";
-          } else {
-            cardClass = "mx-1 w-48 h-72 md:w-60 md:h-[340px] flex-shrink-0 rounded-2xl overflow-hidden border border-[#3B82F6] shadow-[0_0_15px_rgba(59,130,246,0.4)] transform-gpu";
-          }
+    <div className="w-full overflow-hidden bg-transparent relative flex">
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes marqueeLeft { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+        @keyframes marqueeRight { 0% { transform: translateX(-100%); } 100% { transform: translateX(0); } }
+        .marquee-content-left { display: flex; animation: marqueeLeft 22s linear infinite; }
+        .marquee-content-right { display: flex; animation: marqueeRight 22s linear infinite; }
+        .scrollbar-none::-webkit-scrollbar { display: none; }
+      `}} />
 
-          return (
-            <div key={index} className={cardClass}>
-              <div className={isLogoType ? "w-full h-full" : "w-full h-full rounded-xl overflow-hidden"}>
-                <img 
-                  src={getCleanSrc(item)} 
-                  alt="Slider Item" 
-                  draggable="false" 
-                  className={isLogoType ? "w-full h-full object-contain pointer-events-none antialiased transform-gpu" : "w-full h-full object-cover pointer-events-none antialiased transform-gpu"}
-                />
+      {isLogoType ? (
+        /* 🎯 تعديل اللوغويات العائمة: زدنا الـ gap لـ gap-12 والـ pr-12 باش يتباعدوا على بعضياتهم بزاف ويجيو مسرحين ومفينيين */
+        <div className="flex w-full overflow-hidden whitespace-nowrap py-3">
+          <div className={direction === "right" ? 
+            (isCleanLogo ? "marquee-content-right gap-12 pr-12" : "marquee-content-right gap-4 pr-4") : 
+            (isCleanLogo ? "marquee-content-left gap-12 pr-12" : "marquee-content-left gap-4 pr-4")}
+          >
+            {displayItems.map((item, index) => (
+              <div key={`l1-${index}`} className={isCleanLogo ? "mx-4 w-24 h-12 flex-shrink-0 flex items-center justify-center bg-transparent" : "w-16 h-16 md:w-20 md:h-20 lg:w-[85px] lg:h-[85px] border-2 border-[#3B82F6] rounded-2xl p-2 bg-white/5 flex-shrink-0 flex items-center justify-center shadow-[0_0_15px_rgba(59,130,246,0.5)] transform-gpu"}>
+                <img src={getCleanSrc(item)} alt="Logo Item" draggable="false" className="w-full h-full object-contain pointer-events-none antialiased transform-gpu" />
               </div>
-            </div>
-          );
-        })}
-      </div>
+            ))}
+          </div>
+          <div className={direction === "right" ? 
+            (isCleanLogo ? "marquee-content-right gap-12 pr-12" : "marquee-content-right gap-4 pr-4") : 
+            (isCleanLogo ? "marquee-content-left gap-12 pr-12" : "marquee-content-left gap-4 pr-4")} 
+            aria-hidden="true"
+          >
+            {displayItems.map((item, index) => (
+              <div key={`l2-${index}`} className={isCleanLogo ? "mx-4 w-24 h-12 flex-shrink-0 flex items-center justify-center bg-transparent" : "w-16 h-16 md:w-20 md:h-20 lg:w-[85px] lg:h-[85px] border-2 border-[#3B82F6] rounded-2xl p-2 bg-white/5 flex-shrink-0 flex items-center justify-center shadow-[0_0_15px_rgba(59,130,246,0.5)] transform-gpu"}>
+                <img src={getCleanSrc(item)} alt="Logo Item Duplicate" draggable="false" className="w-full h-full object-contain pointer-events-none antialiased transform-gpu" />
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        /* السلايدرات الكبار */
+        <div
+          ref={sliderRef}
+          className="flex items-center w-full py-4 overflow-x-auto scrollbar-none px-2 gap-3 scroll-pl-2 cursor-grab active:cursor-grabbing select-none"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          {displayItems.map((item, index) => {
+            let cardClass = "snap-start flex-shrink-0 ";
+            
+            if (currentVariant === "four-posters") {
+              cardClass += "w-32 h-48 md:w-40 md:h-56 lg:w-48 lg:h-64 rounded-xl overflow-hidden border-2 border-[#3B82F6] shadow-[0_0_15px_rgba(59,130,246,0.45)] transform-gpu";
+            } else if (currentVariant === "mini-poster") {
+              cardClass += "w-32 h-48 md:w-44 md:h-64 lg:w-[240px] lg:h-[360px] rounded-xl overflow-hidden border-2 border-[#3B82F6] shadow-[0_0_18px_rgba(59,130,246,0.5)] transform-gpu";
+            } else {
+              cardClass += "w-48 h-72 md:w-60 md:h-[340px] rounded-2xl overflow-hidden border-2 border-[#3B82F6] shadow-[0_0_22px_rgba(59,130,246,0.6)] transform-gpu";
+            }
+
+            return (
+              <div key={index} className={cardClass}>
+                <div className="w-full h-full rounded-xl overflow-hidden">
+                  <img src={getCleanSrc(item)} alt="Slider Item" draggable="false" className="w-full h-full object-cover pointer-events-none antialiased transform-gpu" />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
 
-// ─── MISSION SECTION (TRANSLATED) ───
+// ─── MISSION SECTION ───
 function MissionSection() {
   const params = useParams();
-  const locale = params?.locale || 'fr';
+  const locale = (params?.locale as string) || 'fr';
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
 
@@ -332,7 +375,7 @@ function MissionSection() {
             style={{ transitionDelay: '1200ms' }}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
             <span className="text-lg tracking-wide">{locale === 'en' ? 'Test IPTV' : 'Test IPTV'}</span>
           </button>
@@ -346,10 +389,11 @@ function MissionSection() {
   );
 }
 
-// ─── HOW IT WORKS SECTION (TRANSLATED) ───
+// ─── HOW IT WORKS SECTION ───
+// ─── HOW IT WORKS SECTION (FIXED CRASH) ───
 function HowItWorksSection() {
   const params = useParams();
-  const locale = params?.locale || 'fr';
+  const locale = (params?.locale as string) || 'fr';
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
 
@@ -369,33 +413,33 @@ function HowItWorksSection() {
 
   const steps = locale === 'en' ? [
     {
-      icon: <svg className="w-12 h-12 text-white mb-6 mx-auto" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>,
+      icon: <svg className="w-12 h-12 text-white mb-6 mx-auto" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>,
       title: "Place Your Order",
       desc: "Place your order by choosing the subscription duration that suits you: 1, 3, 6, or 12 months."
     },
     {
-      icon: <svg className="w-12 h-12 text-white mb-6 mx-auto" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>,
+      icon: <svg className="w-12 h-12 text-white mb-6 mx-auto" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>,
       title: "Get Your Account",
       desc: <>This process takes 15 to 30 minutes. Please check your inbox and spam folder. To speed up the process, <span onClick={() => window.open("https://wa.me/212600000000", "_blank")} className="text-[#E11D48] font-bold cursor-pointer hover:underline">please contact us via WhatsApp.</span></>
     },
     {
-      icon: <svg className="w-12 h-12 text-white mb-6 mx-auto" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
+      icon: <svg className="w-12 h-12 text-white mb-6 mx-auto" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
       title: "Enjoy Your IPTV!",
       desc: "Enjoy all channels, movies, and series right now!"
     }
   ] : [
     {
-      icon: <svg className="w-12 h-12 text-white mb-6 mx-auto" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>,
+      icon: <svg className="w-12 h-12 text-white mb-6 mx-auto" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>,
       title: "Passez votre commande",
       desc: "Passez votre commande en choosing la durée d'abonnement qui vous convient : 1, 3, 6 ou 12 mois."
     },
     {
-      icon: <svg className="w-12 h-12 text-white mb-6 mx-auto" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>,
+      icon: <svg className="w-12 h-12 text-white mb-6 mx-auto" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>,
       title: "Obtenez votre compte.",
       desc: <>Ce processus peut prendre de 15 à 30 minutes. Veuillez vérifier votre boîte de réception ainsi que votre dossier de courriers indésirables. Pour accélérer le processus, <span onClick={() => window.open("https://wa.me/212600000000", "_blank")} className="text-[#E11D48] font-bold cursor-pointer hover:underline">please contact us via WhatsApp.</span></>
     },
     {
-      icon: <svg className="w-12 h-12 text-white mb-6 mx-auto" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
+      icon: <svg className="w-12 h-12 text-white mb-6 mx-auto" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
       title: "Profitez de votre service IPTV !",
       desc: "Profitez de tous les canaux, films et séries dès maintenant !"
     }
@@ -425,10 +469,10 @@ function HowItWorksSection() {
   );
 }
 
-// ─── PRICING SECTION (TRANSLATED) ───
+// ─── PRICING SECTION ───
 function PricingSection() {
   const params = useParams();
-  const locale = params?.locale || 'fr';
+  const locale = (params?.locale as string) || 'fr';
   const [accounts, setAccounts] = useState<1 | 2 | 3>(1);
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
@@ -591,7 +635,7 @@ function PricingSection() {
                   {features.map((feature, i) => (
                     <li key={i} className="flex items-start gap-2">
                       <svg className="w-3.5 h-3.5 text-[#3B82F6] mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+                        <path d="M5 13l4 4L19 7" />
                       </svg>
                       <span className="text-white/80 text-[12.5px] leading-tight font-medium">{feature}</span>
                     </li>
@@ -633,7 +677,7 @@ function PricingSection() {
                 {trialFeatures.map((feat, i) => (
                   <div key={i} className="flex items-center gap-2 border-b border-white/5 pb-1">
                     <svg className="w-3.5 h-3.5 text-white flex-shrink-0 bg-[#3B82F6] rounded-full p-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+                      <path d="M5 13l4 4L19 7" />
                     </svg>
                     <span className="text-white/80 text-xs font-medium">{feat}</span>
                   </div>
@@ -647,7 +691,7 @@ function PricingSection() {
                   className="text-white text-xs flex items-center justify-center gap-2 px-5 py-2 rounded-lg font-bold uppercase tracking-wider w-full lg:w-auto cursor-pointer btn-premium-red transition-transform hover:scale-[1.02]"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
                   {locale === 'en' ? 'Order Test' : 'Commander'}
                 </button>
@@ -664,7 +708,7 @@ function PricingSection() {
 // ─── FOOTER SECTION ───
 function FooterSection() {
   const params = useParams();
-  const locale = params?.locale || 'fr';
+  const locale = (params?.locale as string) || 'fr';
 
   return (
     <footer className="bg-[#030303] border-t border-white/5 pt-10 pb-12 px-6 md:px-10 lg:px-20 relative z-10">
@@ -676,24 +720,24 @@ function FooterSection() {
           </div>
         </div>
 
-        <div className="w-full md:w-2/4 flex flex-wrap justify-center gap-x-8 gap-y-4 text-[13px] font-bold text-white/90">
-          <Link href={`/${locale}/privacy-policy`} prefetch={false} className="hover:text-[#3B82F6] transition-colors">
+        <div className="w-full md:w-2/4 flex flex-col sm:flex-row flex-wrap justify-center items-center gap-y-4 gap-x-8 text-[13px] font-bold text-white/90 text-center">
+          <Link href={`/${locale}/privacy-policy`} prefetch={false} className="hover:text-[#3B82F6] transition-colors whitespace-nowrap">
             {locale === 'en' ? 'Privacy Policy' : 'Politique de confidentialité'}
           </Link>
 
-          <Link href={`/${locale}/terms-of-use`} prefetch={false} className="hover:text-[#3B82F6] transition-colors">
+          <Link href={`/${locale}/terms-of-use`} prefetch={false} className="hover:text-[#3B82F6] transition-colors whitespace-nowrap">
             {locale === 'en' ? 'Terms of Use' : "Conditions d'utilisation"}
           </Link>
 
-          <Link href={`/${locale}/refund-policy`} prefetch={false} className="hover:text-[#3B82F6] transition-colors">
+          <Link href={`/${locale}/refund-policy`} prefetch={false} className="hover:text-[#3B82F6] transition-colors whitespace-nowrap">
             {locale === 'en' ? 'Refund Policy' : 'Politique de remboursement'}
           </Link>
 
-          <Link href={`/${locale}/payment-methods`} prefetch={false} className="hover:text-[#3B82F6] transition-colors">
+          <Link href={`/${locale}/payment-methods`} prefetch={false} className="hover:text-[#3B82F6] transition-colors whitespace-nowrap">
             {locale === 'en' ? 'Payment Methods' : 'Paiement'}
           </Link>
 
-          <a href={`/${locale}#essai`} className="text-white hover:text-[#3B82F6] transition-all duration-200">
+          <a href={`/${locale}#essai`} className="text-white hover:text-[#3B82F6] transition-all duration-200 whitespace-nowrap">
             {locale === 'en' ? 'Contact' : 'Contact'}
           </a>
         </div>
@@ -714,10 +758,10 @@ function FooterSection() {
   );
 }
 
-// ─── FAQ SECTION (TRANSLATED) ───
+// ─── FAQ SECTION ───
 function FaqSection() {
   const params = useParams();
-  const locale = params?.locale || 'fr';
+  const locale = (params?.locale as string) || 'fr';
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -746,8 +790,8 @@ function FaqSection() {
     { q: "Qu'est-ce que l'IPTV et comment ça marche ?", a: "L'IPTV (Internet Protocol Television) diffuse des programmes télévisés via votre connexion Internet plutôt que par des antennes traditionnelles ou le câble. Vous avez juste besoin d'une bonne connexion Internet et d'un appareil compatible (Smart TV, Box Android, PC, Smartphone)." },
     { q: "Puis-je utiliser mon abonnement sur plusieurs appareils ?", a: "Absolument ! Selon le forfait que vous avez choisi lors de la commande (1, 2 ou 3 comptes), vous pouvez utiliser notre service sur plusieurs appareils simultanément. Si vous avez un forfait 1 compte, vous pouvez l'installer sur plusieurs appareils mais l'utiliser sur un seul à la fois." },
     { q: "Quelle vitesse Internet est recommandée ?", a: "Pour une expérience fluide et sans coupures (grâce à notre technologie Anti-Freeze™), nous recommandons une vitesse de connexion d'au moins 15 Mbps pour la qualité HD/FHD, et de 30 Mbps for la 4K." },
-    { q: "L'utilisation d'un VPN est-elle autorisée ?", a: "Oui, tout à fait. L'utilisation d'un VPN est entièrement prise en charge et même recommandée si votre fournisseur d'accès Internet (FAI) bloque ou bride le trafic IPTV." },
-    { q: "Proposez-vous une garantie de remboursement ?", a: "Oui ! Nous offrons une garantie de remboursement de 7 jours. Si vous n'êtes pas entièrement satisfait de notre service, contactez-nous sur WhatsApp et nous vous rembourserons intégralement." }
+    { q: "L'utilisation d'un VPN est-elle autorisée ?", a: "Oui, tout à fait. L'utilisation d'un VPN is entièrement prise en charge et même recommandée si votre fournisseur d'accès Internet (FAI) bloque ou bride le trafic IPTV." },
+    { q: "Proposez-vous une garantie de remboursement ?", a: "Oui ! Nous offrons une garantie de remboursement de 7 jours. Si vous n'êtes pas entièrement satisfait de notre service, contactez-nous on WhatsApp et nous vous rembourserons intégralement." }
   ];
 
   return (
@@ -775,7 +819,7 @@ function FaqSection() {
                   {faq.q}
                 </span>
                 <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${activeIndex === index ? 'bg-[#3B82F6] text-white rotate-180' : 'bg-white/5 text-[#94A3B8]'}`}>
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" /></svg>
                 </div>
               </button>
               <div className={`transition-all duration-500 ease-in-out ${activeIndex === index ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
@@ -796,28 +840,44 @@ function HomeContent() {
   const params = useParams();
   const router = useRouter();
   const pathname = usePathname();
-  const locale = params?.locale || 'fr';
+  const locale = (params?.locale as string) || 'fr';
 
-  const [isOpen, setIsOpen] = useState(false);
+  const [isDesktopOpen, setIsDesktopOpen] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  
+  const desktopDropdownRef = useRef<HTMLDivElement>(null);
+  const mobileDropdownRef = useRef<HTMLDivElement>(null);
 
   const changeLanguage = (nextLocale: 'fr' | 'en') => {
-    if (nextLocale === locale) { setIsOpen(false); return; }
-    const newPath = pathname.replace(`/${locale}`, `/${nextLocale}`);
+    if (nextLocale === locale) { setIsDesktopOpen(false); setIsMobileOpen(false); return; }
+    
+    const segments = pathname.split('/').filter(Boolean);
+    if (segments[0] === locale) {
+      segments[0] = nextLocale;
+    } else {
+      segments.unshift(nextLocale);
+    }
+    
+    const newPath = '/' + segments.join('/');
     router.push(newPath);
-    setIsOpen(false);
+    setIsDesktopOpen(false);
+    setIsMobileOpen(false);
   };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) { setIsOpen(false); }
+      if (desktopDropdownRef.current && !desktopDropdownRef.current.contains(event.target as Node)) {
+        setIsDesktopOpen(false);
+      }
+      if (mobileDropdownRef.current && !mobileDropdownRef.current.contains(event.target as Node)) {
+        setIsMobileOpen(false);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [locale, pathname, router]);
+  }, []);
 
-  // 🎯 تم توحيد روابط الفيديوهات بجودة mp4 من Cloudinary في اللغتين لضمان تشغيلها طيارة
   const slides = locale === 'en' ? [
     {
       id: 1,
@@ -829,13 +889,13 @@ function HomeContent() {
       id: 2,
       h1: <>The Latest Featured<br/> Movies & Series!</>,
       p: "With Strong IPTV, dive into limitless entertainment: over 28,000 live channels and a rich catalog of 200,000 movies and series worldwide, with 100% guaranteed stability.",
-      tag: "TV-EU", video: "https://res.cloudinary.com/ddskjurfk/video/upload/v1780506742/watching-tv_1_b31ym6.mp4"
+      tag: "TV-EU", video: "https://res.cloudinary.com/ddskjurfk/video/upload/v1780506742/watching-together-family_kjtfsh.mp4"
     },
     {
       id: 3,
       h1: <>Let the Magic Happen:<br/> The Ultimate IPTV Experience.</>,
       p: "Travel the world with our exceptional selection of international channels. A universe of endless entertainment, designed to satisfy all your desires.",
-      tag: "TV-EU", video: "https://res.cloudinary.com/ddskjurfk/video/upload/v1780506742/watching-tv_1_b31ym6.mp4"
+      tag: "TV-EU", video: "https://res.cloudinary.com/ddskjurfk/video/upload/v1780531298/The_Ultimate_IPTV_qeneys.mp4"
     }
   ] : [
     {
@@ -847,7 +907,7 @@ function HomeContent() {
     {
       id: 2,
       h1: <>Les derniers films<br/> et séries à la une !</>,
-      p: "Avec Strong IPTV, plongez dans un divertissement sans limite : plus de 28 000 chaînes en direct et un catalogue riche de 200 000 films et séries du monde entier, le tout avec une stabilité 100 % garantie.",
+      p: "Avec Strong IPTV, plongez dans un divertissement sans limite : plus de 28 000 chaînes en direct and un catalogue riche of 200 000 films et séries du monde entier, le tout avec une stabilité 100 % garantie.",
       tag: "TV-EU", video: "https://res.cloudinary.com/ddskjurfk/video/upload/v1780506742/watching-tv_1_b31ym6.mp4"
     },
     {
@@ -858,6 +918,7 @@ function HomeContent() {
     }
   ];
 
+  // 🎯 حيدنا الـ setInterval المزعجة د الجافاسكريبت نهائياً لمنع الانقلاب والقفز التلقائي ف الـ Localhost
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
@@ -880,16 +941,14 @@ function HomeContent() {
   return (
     <div suppressHydrationWarning className="bg-[#050505] min-h-screen font-sans selection:bg-[#3B82F6] text-white overflow-x-hidden w-full relative">
       <div className="w-full">
+        
         <nav className="flex justify-between items-center p-6 border-b border-white/5 sticky top-0 bg-[#050505]/90 backdrop-blur-md z-50 px-8 md:px-20 relative">
           <div className="text-2xl font-black tracking-tighter italic text-[#3B82F6] lg:w-1/4">
             B-SMART<span className="text-white">TV</span>
           </div>
           
           <div className="hidden lg:flex flex-1 justify-center space-x-8 text-[12px] font-bold uppercase tracking-[0.2em] items-center">
-            <a 
-              href={`/${locale}`} 
-              className="relative group text-[#94A3B8] hover:text-white transition duration-300 cursor-pointer"
-            >
+            <a href={`/${locale}`} className="relative group text-[#94A3B8] hover:text-white transition duration-300 cursor-pointer">
               {locale === 'en' ? 'Home' : 'Accueil'}
               <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-[#3B82F6] transition-all duration-300 group-hover:w-full"></span>
             </a>
@@ -905,52 +964,67 @@ function HomeContent() {
               Installation
               <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-[#3B82F6] transition-all duration-300 group-hover:w-full"></span>
             </Link>
-
-            <a 
-              href={`/${locale}#essai`} 
-              onClick={(e) => {
-                const isHomePage = window.location.pathname === `/${locale}` || window.location.pathname === '/';
-                if (isHomePage) {
-                  e.preventDefault();
-                  const element = document.getElementById('essai');
-                  if (element) {
-                    element.scrollIntoView({ behavior: 'smooth' });
-                  }
-                }
-              }}
-              className="relative group text-[#94A3B8] hover:text-white transition duration-300 cursor-pointer"
-            >
+            <a href={`/${locale}#essai`} className="relative group text-[#94A3B8] hover:text-white transition duration-300 cursor-pointer">
               Contact
               <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-[#3B82F6] transition-all duration-300 group-hover:w-full"></span>
             </a>
           </div>
           
-          <div className="hidden lg:flex w-1/4 justify-end lg:-mr-14">
+          <div className="hidden lg:flex items-center gap-4 w-1/4 justify-end lg:-mr-14">
             <button 
-              onClick={() => {
-                document.getElementById('essai')?.scrollIntoView({ behavior: 'smooth' });
-              }}
+              onClick={() => { document.getElementById('essai')?.scrollIntoView({ behavior: 'smooth' }); }}
               className="text-white px-4 py-3 rounded-xl font-black cursor-pointer shadow-xl active:scale-95 transition-all duration-500 hover:scale-105 bg-gradient-to-r from-[#3B82F6] via-[#1e3a8a] to-[#3B82F6] bg-[length:200%_auto] hover:bg-[position:right_center] uppercase text-xs tracking-wider"
             >
               Test IPTV
             </button>
+
+            <div ref={desktopDropdownRef} className="relative font-sans text-black">
+              <button
+                onClick={() => setIsDesktopOpen(!isDesktopOpen)}
+                className="flex items-center justify-between w-[68px] bg-white px-3 py-2 rounded-xl shadow-lg border border-gray-200 font-black text-[13px] tracking-wide uppercase transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer select-none"
+              >
+                <span>{(String(locale)).toUpperCase()}</span>
+                <svg className={`w-3.5 h-3.5 text-gray-600 transition-transform duration-300 ${isDesktopOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {isDesktopOpen && (
+                <div className="absolute top-full mt-2 right-0 w-[110px] bg-white border border-gray-200 rounded-xl shadow-2xl overflow-hidden divide-y divide-gray-100 z-50">
+                  <button onClick={() => changeLanguage('fr')} className={`w-full flex justify-center items-center px-3 py-2.5 font-bold text-xs hover:bg-gray-50 ${locale === 'fr' ? 'bg-blue-50/60 text-[#3B82F6]' : 'text-gray-700'}`}>Français</button>
+                  <button onClick={() => changeLanguage('en')} className={`w-full flex justify-center items-center px-3 py-2.5 font-bold text-xs hover:bg-gray-50 ${locale === 'en' ? 'bg-blue-50/60 text-[#3B82F6]' : 'text-gray-700'}`}>English</button>
+                </div>
+              )}
+            </div>
           </div>
 
-          <button 
-            onClick={() => setIsMenuOpen(true)}
-            className="lg:hidden flex flex-col justify-between w-6 h-4.5 text-white bg-transparent border-0 cursor-pointer focus:outline-none"
-          >
-            <span className="w-full h-[2.5px] bg-white rounded-full"></span>
-            <span className="w-full h-[2.5px] bg-white rounded-full"></span>
-            <span className="w-full h-[2.5px] bg-white rounded-full"></span>
-          </button>
+          <div className="lg:hidden flex items-center gap-3">
+            <div ref={mobileDropdownRef} className="relative font-sans text-black">
+              <button 
+                onClick={() => setIsMobileOpen(!isMobileOpen)} 
+                className="flex items-center justify-between w-[68px] bg-white px-2.5 py-1.5 rounded-xl shadow-md font-black text-[11px] uppercase cursor-pointer select-none border border-gray-200"
+              >
+                <span>{(String(locale)).toUpperCase()}</span>
+                <svg className={`w-3 h-3 text-gray-600 transition-transform duration-300 ${isMobileOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {isMobileOpen && (
+                <div className="absolute top-full mt-2 right-0 w-[105px] bg-white rounded-xl shadow-2xl overflow-hidden z-50 border border-gray-200 divide-y divide-gray-100">
+                  <button onClick={() => changeLanguage('fr')} className={`w-full py-2.5 text-center text-xs font-bold block ${locale === 'fr' ? 'bg-blue-50 text-[#3B82F6]' : 'text-gray-700'}`}>Français</button>
+                  <button onClick={() => changeLanguage('en')} className={`w-full py-2.5 text-center text-xs font-bold block ${locale === 'en' ? 'bg-blue-50 text-[#3B82F6]' : 'text-gray-700'}`}>English</button>
+                </div>
+              )}
+            </div>
+            <button onClick={() => setIsMenuOpen(true)} className="flex flex-col justify-between w-6 h-4.5 text-white bg-transparent border-0 cursor-pointer focus:outline-none">
+              <span className="w-full h-[2.5px] bg-white rounded-full"></span>
+              <span className="w-full h-[2.5px] bg-white rounded-full"></span>
+              <span className="w-full h-[2.5px] bg-white rounded-full"></span>
+            </button>
+          </div>
         </nav>   
 
         {isMenuOpen && (
-          <div 
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[99998] lg:hidden animate-fade-in"
-            onClick={() => setIsMenuOpen(false)}
-          />
+          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[99998] lg:hidden animate-fade-in" onClick={() => setIsMenuOpen(false)} />
         )}
         
         <div className={`fixed inset-y-0 right-0 w-[280px] bg-[#0A0A0A] border-l border-white/10 p-6 shadow-2xl flex flex-col justify-between transition-transform duration-300 ease-in-out lg:hidden z-[99999] ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
@@ -978,10 +1052,7 @@ function HomeContent() {
             </div>
           </div>
           <div className="mt-auto pb-4">
-            <button 
-              onClick={() => { window.open("https://wa.me/212600000000", "_blank"); setIsMenuOpen(false); }}
-              className="w-full text-center text-white px-5 py-3.5 rounded-xl font-black cursor-pointer bg-gradient-to-r from-[#3B82F6] to-[#1d4ed8] text-xs uppercase tracking-wider shadow-lg"
-            >
+            <button onClick={() => { window.open("https://wa.me/212600000000", "_blank"); setIsMenuOpen(false); }} className="w-full text-center text-white px-5 py-3.5 rounded-xl font-black cursor-pointer bg-gradient-to-r from-[#3B82F6] to-[#1d4ed8] text-xs uppercase tracking-wider shadow-lg">
               TEST IPTV
             </button>
           </div>
@@ -991,18 +1062,18 @@ function HomeContent() {
           <div className="absolute inset-y-0 left-0 right-0 z-[80] pointer-events-none">
             {currentSlide > 0 && (
               <button onClick={prevSlide} className="absolute left-0 top-1/2 -translate-y-1/2 h-24 w-6 flex items-center justify-center bg-black/40 backdrop-blur-md border border-white/20 hover:bg-[#3B82F6] pointer-events-auto cursor-pointer rounded-r-lg transition-all">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" /></svg>
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" /></svg>
               </button>
             )}
             {currentSlide < slides.length - 1 && (
               <button onClick={nextSlide} className="absolute right-0 top-1/2 -translate-y-1/2 h-24 w-6 flex items-center justify-center bg-black/40 backdrop-blur-md border border-white/20 hover:bg-[#3B82F6] pointer-events-auto cursor-pointer rounded-l-lg transition-all">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" /></svg>
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" /></svg>
               </button>
             )}
           </div>
           <div className="flex transition-transform duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] w-full h-full" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
             {slides.map((slide, index) => (
-              <div key={slide.id} className="w-full flex-shrink-0 relative min-h-[650px] flex items-center px-8 md:px-24">
+              <div key={slide.id} className="w-full flex-shrink-0 relative min-h-[650px] flex items-center px-4 md:px-24">
                 <div className="absolute inset-0 -z-20 w-full h-full overflow-hidden">
                   <div className="absolute inset-0 bg-[#050505]"></div>
                   <video 
@@ -1012,16 +1083,17 @@ function HomeContent() {
                     loop 
                     playsInline 
                     autoPlay 
-                    muted={isMuted} // 👈 يتبع الـ state لتفعيل وإلغاء الصوت
-                    className="w-full h-full object-cover opacity-50"
+                    preload="auto" 
+                    muted={isMuted} 
+                    className="w-full h-full object-contain md:object-cover opacity-50" 
                   />
                   <div className="absolute inset-0 bg-gradient-to-r from-[#050505] via-[#050505]/40 to-transparent"></div>
                 </div>
-                <div className="relative z-10 max-w-4xl">
-                  <h1 className="text-white text-2xl md:text-4xl font-black leading-[1.1] mb-6 tracking-tight uppercase">{slide.h1}</h1>
+                
+                <div className="relative z-10 max-w-4xl w-full flex flex-col items-center md:items-start text-center md:text-left mx-auto">
+                  <h1 className="text-white text-2xl md:text-4xl font-black leading-[1.1] mb-6 tracking-tight uppercase w-full">{slide.h1}</h1>
                   
-                  {/* 🎯 تم تعديل الـ Spacing والـ flex د هاد السطر باش ما يتخربقش ف التليفون */}
-                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 mb-6 text-sm font-medium">
+                  <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-3 gap-y-1.5 mb-6 text-sm font-medium w-full">
                     <span className="text-yellow-400 font-bold text-base md:text-lg whitespace-nowrap">⭐ 8.5</span>
                     <span className="text-[#94A3B8]">•</span>
                     <span className="text-[#FFF] font-bold text-base md:text-lg whitespace-nowrap">2026</span>
@@ -1030,12 +1102,11 @@ function HomeContent() {
                     <span className="bg-[#3B82F6]/10 text-[#3B82F6] px-3 py-1 rounded-md border border-[#3B82F6]/20 font-bold uppercase text-[10px] ml-1">{slide.tag}</span>
                   </div>
                   
-                  <div className="max-w-2xl mb-8">
+                  <div className="max-w-2xl mb-8 w-full">
                     <p className="text-[#94A3B8] text-sm md:text-base font-medium leading-relaxed">{slide.p}</p>
                   </div>
 
-                  {/* 🎯 بوطونة الصوت وبوطونة الاشتراك مجموعين بشكل متناسق في نفس المكان */}
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center justify-center md:justify-start gap-4 w-full">
                     <button 
                       onClick={() => window.open("https://wa.me/212600000000", "_blank")}
                       className="text-white px-6 py-4 rounded-xl font-black cursor-pointer shadow-xl active:scale-95 transition-all duration-500 hover:scale-105 bg-gradient-to-r from-[#3B82F6] via-[#1e3a8a] to-[#3B82F6] bg-[length:200%_auto] hover:bg-[position:right_center] uppercase text-xs tracking-wider"
@@ -1043,7 +1114,6 @@ function HomeContent() {
                       {locale === 'en' ? 'Subscribe Now' : "S'abonner maintenant"}
                     </button>
                     
-                    {/* 🔊 أيقونة الصوت متموضعة بنقاء هنا حدا البوطونة ديريكت ومريحة للشوفة */}
                     <button 
                       onClick={() => setIsMuted(prev => !prev)} 
                       className="p-3.5 bg-black/60 backdrop-blur-xl border border-white/20 rounded-xl hover:bg-[#3B82F6] transition-all active:scale-95 shadow-xl cursor-pointer"
@@ -1062,7 +1132,7 @@ function HomeContent() {
         <section className="py-8 bg-[#050505] overflow-hidden">
           <div className="flex flex-col space-y-10">
             <div className="relative w-full">
-              <DraggableSlider items={["Appel-tv.png", "europa league.png", "fire-tv.png", "Fox_Channel.png", "laliga.png", "premier-league.png", "uefa-womens.png"]} variant="logo" direction="right" speed={1.6} pauseDuration={3000} />
+              <DraggableSlider items={["Appel-tv.png", "europa league.png", "fire-tv.png", "Fox_Channel.png", "laliga.png", "premier-league.png", "uefa-womens.png"]} variant="logo" direction="right" />
             </div>
             <div className="text-center px-6">
               <p className="text-[#94A3B8] text-sm md:text-base max-w-4xl mx-auto leading-relaxed font-medium">
@@ -1091,7 +1161,7 @@ function HomeContent() {
                    "https://media.themoviedb.org/t/p/w300_and_h450_face/ztkUQFLlC19CCMYHW9o1zWhJRNq.jpg",
                    "https://media.themoviedb.org/t/p/w300_and_h450_face/7DJKHzAi83BmQrWLrYYOqcoKfhR.jpg",
                     ]}
-                     variant="poster" direction="left" speed={1} pauseDuration={1500} />
+                     variant="poster" direction="left" />
           </div>
         </section>
           
@@ -1101,7 +1171,7 @@ function HomeContent() {
 
         <section className="py-6 bg-[#050505] overflow-hidden">
           <div className="relative w-full">
-            <DraggableSlider items={["netflix","Fubo-tv", "global-tv", "hulu", "pbs", "Vod","primevideo" ]} variant="clean-logo" direction="left" speed={1.5} pauseDuration={3000} />
+            <DraggableSlider items={["netflix","Fubo-tv", "global-tv", "hulu", "pbs", "Vod","primevideo" ]} variant="clean-logo" direction="left" />
           </div>
         </section>
 
@@ -1118,45 +1188,6 @@ function HomeContent() {
               <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397 0 11.948 0c3.173.001 6.154 1.241 8.396 3.486 2.241 2.246 3.475 5.23 3.471 8.406-.013 6.545-5.352 11.893-11.901 11.893-2.008-.002-3.98-.511-5.73-1.479L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.747 1.451 5.436 0 9.86-4.427 9.872-9.869.006-2.636-1.018-5.114-2.885-6.983A9.782 9.782 0 0 0 11.944 1.41C6.51 1.41 2.083 5.834 2.072 11.272c-.001 1.63.435 3.21 1.262 4.623l-.116.185-1.018 3.722 3.812-.999.191.113z"/>
             </svg>
           </button>
-        </div>
-
-        <div 
-          ref={dropdownRef} 
-          className={`fixed top-[110px] right-6 font-sans text-black z-[90] transition-all duration-300 ${isMenuOpen ? 'opacity-0 invisible translate-x-10' : 'opacity-100 visible translate-x-0'}`}
-        >
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="flex items-center justify-between w-[68px] bg-white px-3 py-2 rounded-xl shadow-[0_4px_25px_rgba(0,0,0,0.4)] border border-gray-200 font-black text-[13px] tracking-wide uppercase transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer select-none"
-          >
-            {locale === 'fr' ? (
-              <span className="text-gray-900">FR</span> 
-            ) : (
-              <span className="text-gray-900">EN</span>
-            )}
-            <svg 
-              className={`w-3.5 h-3.5 text-gray-600 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} 
-              fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-
-          {isOpen && (
-            <div className="absolute top-full mt-2 right-0 w-[110px] bg-white border border-gray-200 rounded-xl shadow-[0_4px_25px_rgba(0,0,0,0.3)] overflow-hidden divide-y divide-gray-100 z-50">
-              <button
-                onClick={() => changeLanguage('fr')}
-                className={`w-full flex justify-center items-center px-3 py-2.5 text-center font-bold text-xs hover:bg-gray-50 cursor-pointer ${locale === 'fr' ? 'bg-blue-50/60 text-[#3B82F6]' : 'text-gray-700'}`}
-              >
-                Français
-              </button>
-              <button
-                onClick={() => changeLanguage('en')}
-                className={`w-full flex justify-center items-center px-3 py-2.5 text-center font-bold text-xs hover:bg-gray-50 cursor-pointer ${locale === 'en' ? 'bg-blue-50/60 text-[#3B82F6]' : 'text-gray-700'}`}
-              >
-                English
-              </button>
-            </div>
-          )}
         </div>
 
       </div>
