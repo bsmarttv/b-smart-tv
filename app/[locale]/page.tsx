@@ -306,16 +306,16 @@ function MissionSection() {
               </li>
             ))}
           </ul>
-          <button 
-            onClick={() => window.open("https://wa.me/447723340014", "_blank")}
-            className={`text-white font-bold py-4 px-8 rounded-2xl flex items-center gap-3 cursor-pointer transform btn-premium-red ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-            style={{ transitionDelay: '1200ms' }}
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-            <span className="text-lg tracking-wide">{locale === 'en' ? 'Test IPTV' : 'Test IPTV'}</span>
-          </button>
+<button 
+  onClick={() => window.open("https://wa.me/447723340014", "_blank")}
+  className={`absolute bottom-6 left-1/2 -translate-x-1/2 w-[85%] text-white font-bold py-4 px-8 rounded-2xl flex items-center justify-center gap-3 cursor-pointer transform btn-premium-red ${isVisible ? 'opacity-100' : 'opacity-0'}`}
+  style={{ transition: 'opacity 0.5s ease', transitionDelay: '300ms' }}
+>
+  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+  </svg>
+  <span className="text-lg tracking-wide">{locale === 'en' ? 'Test IPTV' : 'Test IPTV'}</span>
+</button>
         </div>
         <div className={`w-full lg:w-1/2 relative group transform transition-all duration-1000 delay-500 ease-out ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-20'}`}>
           <div className="absolute -inset-4 bg-gradient-to-r from-red-600/20 to-blue-600/20 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
