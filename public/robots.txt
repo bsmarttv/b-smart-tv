@@ -1,0 +1,14 @@
+# الكود مخصص لحماية موقع IPTV ديالك
+User-agent: *
+Disallow: /api/
+Disallow: /_next/
+Disallow: /static/
+Disallow: /admin/
+Disallow: /dashboard/
+
+# السماح لأرشفة الصفحات العامة اللي كيشوفها الزبون
+Allow: /
+Allow: /_next/static/css/
+
+# هنا كتحط رابط السيت ماب ديالك من بعد (إيلا قاديتيها)
+# Sitemap: https://your-domain.com/sitemap.xml

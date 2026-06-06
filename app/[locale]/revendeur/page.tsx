@@ -1,6 +1,7 @@
 "use client";
 import React from 'react';
 import { useParams } from 'next/navigation';
+import Link from 'next/link'; // 🎯 زدنا هادي باش يكون التنقل فوري بلا فلاش
 
 export default function Revendeur() {
   const params = useParams();
@@ -31,14 +32,14 @@ export default function Revendeur() {
       {/* 🎯 ردّينا المحاذاة لليسر text-left وطيرنا السنتر */}
       <div className="max-w-3xl mx-auto w-full text-left">
         
-        {/* 🎯 بوطون العودة: دابا جا لاصق على اليسار فوق العنوان نيشااان بالستايل الأزرق والـ Underline */}
+        {/* 🎯 بوطون العودة: دابا مخدوم بـ Link ديال Next.js باش ما يديرش الفلاش */}
         <div className="mb-6">
-          <a 
+          <Link 
             href={`/${locale}`} 
             className="text-[#3B82F6] hover:underline font-bold text-sm md:text-base transition duration-300"
           >
             {content.back}
-          </a>
+          </Link>
         </div>
 
         <h1 className="text-3xl md:text-5xl font-black text-white mb-6 uppercase tracking-tight">
@@ -58,7 +59,7 @@ export default function Revendeur() {
         </div>
 
         <a 
-          href="https://wa.me/YOUR_PHONE_NUMBER" /* غاتحط هنا رابط الواتساب بالنمرة ديالك */
+          href="https://wa.me/447723340014" /* غاتحط هنا رابط الواتساب بالنمرة ديالك */
           target="_blank" 
           rel="noopener noreferrer"
           className="inline-block bg-[#3B82F6] hover:bg-[#2563EB] text-white font-bold text-sm md:text-base px-8 py-4 rounded-xl transition-all cursor-pointer transform hover:scale-105 shadow-lg shadow-blue-500/10"

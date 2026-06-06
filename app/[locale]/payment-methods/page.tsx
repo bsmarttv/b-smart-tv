@@ -55,7 +55,6 @@ export default function PaymentMethods() {
               <img src="/payment-icons/icon-visa.svg" alt="Visa" className="h-6 w-auto rounded border border-white/10" />
               <img src="/payment-icons/icon-mastercard.svg" alt="Mastercard" className="h-6 w-auto rounded border border-white/10" />
               <img src="/payment-icons/icon-paypal.svg" alt="Paypal" className="h-6 w-auto rounded border border-white/10" />
-              <img src="/payment-icons/icon-discover.svg" alt="Discover" className="h-6 w-auto rounded border border-white/10" />
             </div>
           </div>
           
