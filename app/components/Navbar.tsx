@@ -106,7 +106,6 @@ export default function Navbar() {
             Installation
             <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-[#3B82F6] transition-all duration-300 group-hover:w-full"></span>
           </Link>
-          {/* 🎯 ربطنا هادي بالدالة الذكية */}
           <a href={`/${locale}#essai`} onClick={scrollToEssai} className="relative group text-[#94A3B8] hover:text-white transition duration-300 cursor-pointer">
             Contact
             <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-[#3B82F6] transition-all duration-300 group-hover:w-full"></span>
@@ -115,7 +114,6 @@ export default function Navbar() {
 
         <div className="flex items-center gap-4 relative z-[100010]">
           
-          {/* 🎯 ربطنا هادي بالدالة الذكية */}
           <button 
             onClick={scrollToEssai}
             className="hidden md:block text-white px-4 py-2.5 rounded-xl font-black cursor-pointer shadow-xl active:scale-95 transition-all duration-500 hover:scale-105 bg-gradient-to-r from-[#3B82F6] via-[#1e3a8a] to-[#3B82F6] bg-[length:200%_auto] hover:bg-[position:right_center] uppercase text-xs tracking-wider"
@@ -175,7 +173,8 @@ export default function Navbar() {
       </nav>
 
       {isOpen && (
-        <div className="fixed inset-0 h-screen w-screen z-[9999] flex md:hidden">
+        // 🛠️ هنا صلحنا الارتفاع رجعناه fixed inset-y-0 مع h-[100dvh] الذكية د التيليفونات
+        <div className="fixed inset-y-0 right-0 h-[100dvh] w-screen z-[9999] flex md:hidden">
           
           <div 
             className="flex-1 h-full bg-black/40"
@@ -183,7 +182,8 @@ export default function Navbar() {
             style={{ WebkitBackdropFilter: 'blur(20px) saturate(140%)', backdropFilter: 'blur(20px) saturate(140%)' }}
           />
 
-          <div className="w-[280px] sm:w-[320px] h-full bg-[#09090b] flex flex-col justify-between border-l border-white/5 shadow-[-20px_0_50px_rgba(0,0,0,0.9)] animate-[slideInRight_0.25s_cubic-bezier(0.16,1,0.3,1)]">
+          {/* 🛠️ الـ Container الرئيسي نقصنا العرض لـ w-[260px] وزدنا pb-12 باش البوطون تطلع فوق التلفون ديريكت */}
+          <div className="w-[260px] sm:w-[300px] h-full bg-[#09090b] flex flex-col justify-between border-l border-white/5 shadow-[-20px_0_50px_rgba(0,0,0,0.9)] pb-12 animate-[slideInRight_0.25s_cubic-bezier(0.16,1,0.3,1)]">
             
             <div>
               <div className="flex items-center justify-between p-6 border-b border-white/5">
@@ -197,7 +197,7 @@ export default function Navbar() {
                 </button>
               </div>
 
-              <div className="flex flex-col px-6 w-full text-left font-bold text-[13px] uppercase tracking-widest text-white/90 mt-2">
+              <div className="flex flex-col px-6 w-full text-left font-bold text-[12px] uppercase tracking-widest text-white/90 mt-2">
                 <Link href={`/${locale}`} prefetch={false} onClick={() => setIsOpen(false)} className="py-4 border-b border-white/5 hover:text-[#3B82F6] transition-colors w-full block">
                   {locale === 'en' ? 'HOME' : 'ACCUEIL'}
                 </Link>
@@ -210,18 +210,17 @@ export default function Navbar() {
                 <Link href={`/${locale}/installation`} prefetch={false} onClick={() => setIsOpen(false)} className="py-4 border-b border-white/5 hover:text-[#3B82F6] transition-colors w-full block">
                   INSTALLATION
                 </Link>
-                {/* 🎯 ربطنا هادي بالدالة الذكية */}
                 <a href={`/${locale}#essai`} onClick={scrollToEssai} className="py-4 hover:text-[#3B82F6] transition-colors w-full block">
                   CONTACT
                 </a>
               </div>
             </div>
 
-            <div className="p-6 pb-8">
-              {/* 🎯 ربطنا هادي بالدالة الذكية */}
+            {/* 🛠️ هنا عطينا للبوطون px-4 و mb-4 باش تجي مجموعة وباينة ونقصنا حجم الخط شوية */}
+            <div className="px-4 w-full">
               <button 
                 onClick={scrollToEssai}
-                className="w-full py-4 bg-[#2563EB] hover:bg-blue-600 text-white font-black rounded-xl text-xs tracking-widest transition-colors shadow-2xl active:scale-95 uppercase"
+                className="w-full py-3.5 bg-[#2563EB] hover:bg-blue-600 text-white font-black rounded-xl text-[11px] tracking-widest transition-colors shadow-2xl active:scale-95 uppercase"
               >
                 TEST IPTV
               </button>
