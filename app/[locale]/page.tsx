@@ -307,21 +307,21 @@ function MissionSection() {
               </li>
             ))}
           </ul>
-<button 
+        <button 
   onClick={() => {
     const essaiElement = document.getElementById('essai');
     if (essaiElement) essaiElement.scrollIntoView({ behavior: 'smooth' });
   }}
-  className={`w-fit mx-0 mt-4 text-white font-bold py-3.5 px-8 rounded-2xl flex items-center justify-center gap-3 cursor-pointer transform btn-premium-red shadow-xl hover:scale-105 active:scale-95 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+  className={`!w-fit max-w-fit mx-0 mt-4 text-white font-bold py-3.5 px-6 rounded-2xl flex items-center justify-center gap-3 cursor-pointer transform btn-premium-red shadow-xl hover:scale-105 active:scale-95 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
   style={{ transition: 'all 0.4s ease', transitionDelay: '200ms' }}
 >
-  <svg className="w-6 h-6 animate-bounce" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+  <svg className="w-5 h-5 animate-bounce" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
   </svg>
-  <span className="text-base sm:text-lg tracking-wide">
+  <span className="text-sm sm:text-base tracking-wide whitespace-nowrap">
     {locale === 'en' ? 'Test IPTV Now' : 'Essai Gratuit Maintenant'}
   </span>
-</button>         
+</button>       
 
         </div>
         <div className={`w-full lg:w-1/2 relative group transform transition-all duration-1000 delay-500 ease-out ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-20'}`}>
