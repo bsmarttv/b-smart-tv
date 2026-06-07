@@ -588,9 +588,29 @@ function PricingSection() {
                 </button>
 
                 <div className="flex justify-center items-center gap-4 mt-3">
-                  <img src="/payment-icons/icon-visa.svg" alt="Visa" className="h-6 w-auto rounded border border-white/10" />
-                  <img src="/payment-icons/icon-mastercard.svg" alt="Mastercard" className="h-6 w-auto rounded border border-white/10" />
-                  <img src="/payment-icons/icon-paypal.svg" alt="Paypal" className="h-6 w-auto rounded border border-white/10" />
+                <img 
+  src="/payment-icons/icon-visa.svg" 
+  alt="Visa" 
+  width={38} 
+  height={24} 
+  className="h-6 w-auto rounded border border-white/10" 
+/>
+
+<img 
+  src="/payment-icons/icon-mastercard.svg" 
+  alt="Mastercard" 
+  width={38} 
+  height={24} 
+  className="h-6 w-auto rounded border border-white/10" 
+/>
+
+<img 
+  src="/payment-icons/icon-paypal.svg" 
+  alt="Paypal" 
+  width={38} 
+  height={24} 
+  className="h-6 w-auto rounded border border-white/10" 
+/>
                 </div>
               </div>
             );

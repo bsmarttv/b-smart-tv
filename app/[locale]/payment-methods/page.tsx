@@ -52,9 +52,9 @@ export default function PaymentMethods() {
             <p className="mb-4">{content.s1_desc}</p>
             {/* لوغويات الدفع وسط الصفحة للزينة والجمالية */}
             <div className="flex items-center gap-3 bg-white/5 p-4 rounded-xl border border-white/5 w-fit">
-              <img src="/payment-icons/icon-visa.svg" alt="Visa" className="h-6 w-auto rounded border border-white/10" />
-              <img src="/payment-icons/icon-mastercard.svg" alt="Mastercard" className="h-6 w-auto rounded border border-white/10" />
-              <img src="/payment-icons/icon-paypal.svg" alt="Paypal" className="h-6 w-auto rounded border border-white/10" />
+              <img src="/payment-icons/icon-visa.svg" alt="Visa" className="h-6 w-auto rounded border border-white/10 width={150} height={50}" />
+              <img src="/payment-icons/icon-mastercard.svg" alt="Mastercard" className="h-6 w-auto rounded border border-white/10 width={150} height={50}" />
+              <img src="/payment-icons/icon-paypal.svg" alt="Paypal" className="h-6 w-auto rounded border border-white/10 width={150} height={50}" />
             </div>
           </div>
           
