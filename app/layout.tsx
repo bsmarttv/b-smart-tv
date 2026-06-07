@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/Navbar";
-import { GoogleTagManager } from '@next/third-parties/google'; // 🎯 زدنا هاد السطر هنا
+import Script from "next/script"; // 🎯 عيطنا للـ Script الذكي هنا فوض المكتبة القديمة
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,14 +26,19 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      {/* 🎯 هنا حطينا الـ ID ديالك د التتبع وغايتطحن أوتوماتيكياً ف كاع الصفحات */}
-      <GoogleTagManager gtmId="GTM-NX7Z2G4Z" />
       <body className="min-h-full flex flex-col bg-[#050505] text-white">
-        {/* الـ Navbar دابا عيطنا ليه هنا وغادي يبقى شاد بلاصتو بلا ما يتعاود يتشارجا */}
+        {/* الـ Navbar ديالك */}
         <Navbar />
         
-        {/* هنا فين كيتشارجا المحتوى المتغير ديال كاع الصفحات */}
+        {/* المحتوى د السيت */}
         <main className="flex-grow pt-[72px]">{children}</main>
+
+        {/* 🎯 هاد اللمسة السحرية كتشارج التاغ مانجر مورا ما يسالي السيت كامل بلا ما يتقلو */}
+        <Script
+          id="gtm-script"
+          strategy="afterInteractive" // كيتشارجا بذكاء مورا ما الصفحة تولي واجدة
+          src="https://www.googletagmanager.com/gtm.js?id=GTM-NX7Z2G4Z"
+        />
       </body>
     </html>
   );
