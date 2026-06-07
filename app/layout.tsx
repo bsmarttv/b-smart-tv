@@ -21,16 +21,14 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-  params, // 🎯 زدنا params هنا باش نعرفو واش fr أولا en أوتوماتيكياً
 }: {
   children: React.ReactNode;
-  params: { locale: string }; // 🎯 تحديد النوع د الـ params فـ TypeScript
 }) {
   return (
     <html 
-      lang={params?.locale || "fr"} // 🎯 كايقرا اللغة ديناميكياً على حساب المتصفح
+      lang="fr" // 🎯 رجعناها ثابتة هنا حيت الـ Middleware د Next.js كيتكلف باللغات أوتوماتيكياً بلا مشاكل د TypeScript
       suppressHydrationWarning 
-      data-scroll-behavior="smooth" // 🚀 الضربة القاضية اللي غاتحيد الـ Warning د الـ Smooth Scroll نهائياً!
+      data-scroll-behavior="smooth" // 🚀 الخاصية د السكرول كتبقى خدامة ونادّية
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-[#050505] text-white">
