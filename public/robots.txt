@@ -10,5 +10,5 @@ Disallow: /dashboard/
 Allow: /
 Allow: /_next/static/css/
 
-# هنا كتحط رابط السيت ماب ديالك من بعد (إيلا قاديتيها)
-# Sitemap: https://your-domain.com/sitemap.xml
+# الرابط الرسمي د الـ Sitemap ديالك دابا بـ bsmarttv
+Sitemap: https://www.bsmarttv.com/sitemap.xml

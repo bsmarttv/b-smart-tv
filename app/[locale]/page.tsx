@@ -160,7 +160,7 @@ function DraggableSlider({
         if (entry.isIntersecting) startAutoPlay();
         else killAllAnimations();
       },
-      { threshold: 0.3 }
+      { threshold: 0.2 }
     );
 
     observer.observe(slider);
@@ -341,7 +341,7 @@ function HowItWorksSection() {
           __observer.disconnect();
         }
       },
-      { threshold: 0.2 }
+      { threshold: 0.05 }
     );
     if (sectionRef.current) __observer.observe(sectionRef.current);
     return () => __observer.disconnect();
@@ -833,38 +833,41 @@ const slides = locale === 'en' ? [
       id: 1,
       h1: <>Best <span className="text-[#3B82F6]">IPTV Subscription 2026</span> <br/> Watch Live TV, Movies and Sports in HD</>,
       p: <>Enjoy an ultra-smooth <span className="text-[#3B82F6]">4K</span> streaming and <span className="text-[#3B82F6]">buffer-free</span> experience on all your devices, wherever you are.</>,
-      tag: "TV-EU", video: "https://res.cloudinary.com/ddskjurfk/video/upload/v1780724711/iptv-sports_pboa1j.mp4"
+      poster: "https://res.cloudinary.com/ddskjurfk/image/upload/v1780828302/hero-bg_w9ebsk.webp"
     },
     {
       id: 2,
       h1: <>The Latest Featured<br/> Movies & Series!</>,
       p: <>With <span className="text-[#3B82F6]">Strong IPTV</span> , dive into limitless entertainment: over 28,000 live channels and a rich catalog of 200,000 movies and series worldwide, with <span className="text-[#3B82F6]">100% guaranteed stability.</span></>,
-      tag: "TV-EU", video: "https://res.cloudinary.com/ddskjurfk/video/upload/v1780506742/watching-together-family_kjtfsh.mp4"
+      tag: "TV-EU", video: "https://res.cloudinary.com/ddskjurfk/video/upload/f_auto,q_auto/v1780506742/watching-together-family_kjtfsh.mp4",
+
     },
     {
       id: 3,
       h1: <>Let the Magic Happen:<br/> The Ultimate IPTV Experience.</>,
       p: <>Travel the world with our exceptional selection of international channels. A universe of endless entertainment, designed to satisfy all your desires.</>,
-      tag: "TV-EU", video: "https://res.cloudinary.com/ddskjurfk/video/upload/v1780771731/Let_the_Magic_Happen__The_Ulti_chcc2z.mp4"
+      tag: "TV-EU", video: "https://res.cloudinary.com/ddskjurfk/video/upload/f_auto,q_auto/v1780771731/Let_the_Magic_Happen__The_Ulti_chcc2z.mp4",
+
     }
   ] : [
     {
       id: 1,
-      h1: <>Meilleur abonnement <span className="text-[#3B82F6]">IPTV 2026</span> <br/> Regardez la télévision en direct, des films et du sport en HD</>,
+      h1: <>Meilleur abonnement <span className="text-[#3B82F6]" ><br/> IPTV 2026</span> <br/> Regardez la télévision en direct, des films et du sport en HD</>,
       p: <>Profitez d'un streaming <span className="text-[#3B82F6]">4K</span> ultra-fluide et <span className="text-[#3B82F6]">sans coupure</span> sur tous vos appareils, où que vous soyez.</>,
-      tag: "TV-EU", video: "https://res.cloudinary.com/ddskjurfk/video/upload/v1780724711/iptv-sports_pboa1j.mp4"
+       poster: "https://res.cloudinary.com/ddskjurfk/image/upload/v1780828302/hero-bg_w9ebsk.webp"
     },
     {
       id: 2,
       h1: <>Les derniers films<br/> et séries à la une !</>,
       p: "Avec Strong IPTV, plongez dans un divertissement sans limite : plus de 28 000 chaînes en direct and un catalogue riche of 200 000 films et séries du monde entier, le tout avec une stabilité 100 % garantie.",
-      tag: "TV-EU", video: "https://res.cloudinary.com/ddskjurfk/video/upload/v1780506742/watching-together-family_kjtfsh.mp4" // 🎯 هادا تصلح
+      tag: "TV-EU", video: "https://res.cloudinary.com/ddskjurfk/video/upload/f_auto,q_auto/v1780506742/watching-together-family_kjtfsh.mp4",
+
     },
     {
       id: 3,
       h1: <>Laissez la magie opérer :<br/> l'expérience IPTV ultime.</>,
       p: "Voyagez à travers le monde avec notre selection exceptionnelle de chaînes internationales. Un univers de divertissement sans limite, pensé pour satisfaire toutes vos envies",
-      tag: "TV-EU", video: "https://res.cloudinary.com/ddskjurfk/video/upload/v1780771731/Let_the_Magic_Happen__The_Ulti_chcc2z.mp4" // 🎯 وهادا حتى هو تصلح
+      tag: "TV-EU", video: "https://res.cloudinary.com/ddskjurfk/video/upload/f_auto,q_auto/v1780771731/Let_the_Magic_Happen__The_Ulti_chcc2z.mp4"
     }
   ];
 
@@ -890,9 +893,8 @@ const slides = locale === 'en' ? [
   return (
     <div suppressHydrationWarning className="bg-[#050505] min-h-screen font-sans selection:bg-[#3B82F6] text-white overflow-x-hidden w-full relative">
       <div className="w-full">
-        
-        {/* الـ Header المطور مع حماية الـ Overlap والـ Dots غِير ف التيليفون */}
-        <header className="relative w-full overflow-hidden min-h-[700px] sm:min-h-[750px] md:min-h-[650px] lg:min-h-[700px] flex items-center bg-[#050505]">
+      {/* 🎯 صغرنا الـ min-h ف التيليفون باش يتجمع الهيدر وما يهربوش النقط */}
+        <header className="relative w-full overflow-hidden min-h-[580px] sm:min-h-[650px] md:min-h-[650px] lg:min-h-[700px] flex items-center bg-[#050505]">
           
           {/* أسهم التنقل للـ PC */}
           <div className="absolute inset-y-0 left-0 right-0 z-[80] pointer-events-none">
@@ -907,74 +909,79 @@ const slides = locale === 'en' ? [
               </button>
             )}
           </div>
-{/* محتوى السلايدر */}
+
+          {/* محتوى السلايدر */}
           <div className="flex transition-transform duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] w-full h-full pointer-events-none" style={{ transform: `translateX(-${currentSlide * 100}%)`, willChange: 'transform' }}>
             {slides.map((slide, index) => (
               <div 
-                key={`${locale}-slide-${slide.id}-${slide.video}`} // 🎯 الـضـربـة الـقـاضـيـة: حـطـيـنـا الـ key هـنـا فـ الـ div الـكـبـيـر
-                className="w-full flex-shrink-0 relative min-h-[700px] sm:min-h-[750px] md:min-h-[650px] lg:min-h-[700px] flex items-center px-4 md:px-24 pt-20 pb-16 md:py-0"
+                key={`${locale}-slide-${slide.id}-${slide.video}`}
+                className="w-full flex-shrink-0 relative min-h-[580px] sm:min-h-[650px] md:min-h-[650px] lg:min-h-[700px] flex items-center px-4 md:px-24 pt-24 pb-20 md:py-0" // 🎯 نقصنا الـ pb وزدنا pt24 على قبل الـ Navbar
               >
                 
-{/* الفيديو والـ Overlay */}
+                {/* الفيديو والـ Overlay */}
                 <div className="absolute inset-0 -z-20 w-full h-full overflow-hidden">
                   <div className="absolute inset-0 bg-[#050505]"></div>
-                  
-                  {/* 🎯 السلاح السري: استعملنا <source> وعطينا للفيديو key خاص بيه باش يتدمر ويتبنى من الزيرو */}
-                  <video 
-                    ref={(el) => { videoRefs.current[index] = el; }} 
-                    key={`vid-${locale}-${slide.id}-${slide.video}`} 
-                    loop 
-                    playsInline 
-                    autoPlay 
-                    preload="auto" 
-                    muted={isMuted} 
-                    className="w-full h-full object-cover opacity-40 md:opacity-50" 
-                  >
-                    <source src={slide.video} type="video/mp4" />
-                  </video>
-
+<video 
+  ref={(el) => { videoRefs.current[index] = el; }} 
+  key={`vid-${locale}-${slide.id}-${slide.video}`} 
+  loop 
+  playsInline 
+  autoPlay 
+  
+  // 🚀 الـسـحـر هـنـا: الـ Slide الأول كـيـاخـد auto أولا metadata بـاش يـطـيـر، ولـخـريـن كـايـتـشـارجـاو خـفـيـف ف الـ كـوالـيـس
+  preload={index === 0 ? "auto" : "metadata"} 
+  
+  poster={slide.poster} 
+  muted={isMuted} 
+  className="w-full h-full object-cover opacity-40 md:opacity-50" 
+>
+  <source src={slide.video} type="video/mp4" />
+</video>
                   <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/70 to-transparent md:bg-gradient-to-r md:from-[#050505] md:via-[#050505]/50 md:to-transparent"></div>
                 </div>
                 
-                {/* المحتوى الداخلي */}
-                <div className="relative z-10 max-w-4xl w-full flex flex-col items-center md:items-start text-center md:text-left mx-auto pointer-events-auto">
+                {/* المحتوى الداخلي - مجموع ف السنتر */}
+                <div className="relative z-10 max-w-4xl w-full flex flex-col items-center justify-center text-center mx-auto pointer-events-auto px-2">
                   
-                  <h1 className="text-white text-lg sm:text-2xl md:text-4xl lg:text-5xl font-black leading-[1.3] sm:leading-[1.2] md:leading-[1.1] mb-4 tracking-tight uppercase max-w-[92%] sm:max-w-full mx-auto md:mx-0">
-  {slide.h1}
-</h1>
+                  {/* 🎯 صغرنا الكلمات شوية ف التيليفون باش ما تفرقش السطور بزاف */}
+                  <h1 className="text-white text-lg sm:text-2xl md:text-4xl lg:text-5xl font-black leading-[1.25] md:leading-[1.1] mb-3 tracking-tight uppercase max-w-[95%]">
+                    {slide.h1}
+                  </h1>
                   
-                  <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-2.5 gap-y-1 mb-3 text-xs md:text-sm font-medium w-full">
-                    <span className="text-yellow-400 font-bold text-base whitespace-nowrap">⭐ 8.5</span>
+                  <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5 mb-3 text-[11px] md:text-sm font-medium w-full">
+                    <span className="text-yellow-400 font-bold text-sm whitespace-nowrap">⭐ 8.5</span>
                     <span className="text-[#94A3B8]">•</span>
-                    <span className="text-[#FFF] font-bold text-sm whitespace-nowrap">2026</span>
+                    <span className="text-[#FFF] font-bold text-xs whitespace-nowrap">2026</span>
                     <span className="text-[#94A3B8]">•</span>
-                    <span className="text-[#FFF] font-bold text-sm whitespace-nowrap">
+                    <span className="text-[#FFF] font-bold text-xs whitespace-nowrap">
                       {locale === 'en' ? 'Free Update' : 'Mise a jour gratuite'}
                     </span>
-                    <span className="bg-[#3B82F6]/10 text-[#3B82F6] px-2.5 py-0.5 rounded-md border border-[#3B82F6]/20 font-bold uppercase text-[9px] ml-1">
+                    <span className="bg-[#3B82F6]/10 text-[#3B82F6] px-2 py-0.5 rounded-md border border-[#3B82F6]/20 font-bold uppercase text-[8px] ml-1">
                       {slide.tag}
                     </span>
                   </div>
                   
-                  <div className="max-w-2xl mb-5 w-full px-2 md:px-0">
-                    <p className="text-[#94A3B8] text-xs sm:text-sm md:text-base font-medium leading-relaxed line-clamp-3 md:line-clamp-none">
+                  {/* 🎯 صغرنا الـ mb هنا من 5 لـ 4 */}
+                  <div className="max-w-xl mb-4 w-full px-2">
+                    <p className="text-[#94A3B8] text-[11px] sm:text-sm md:text-base font-medium leading-relaxed line-clamp-3 md:line-clamp-none">
                       {slide.p}
                     </p>
                   </div>
 
-                  <div className="flex items-center justify-center md:justify-start gap-3 w-full">
+                  <div className="flex items-center justify-center gap-3 w-full">
                     <button 
-                      onClick={() => window.open("https://wa.me/447723340014", "_blank")}
-                      className="text-white px-5 py-3.5 rounded-xl font-black cursor-pointer shadow-xl active:scale-95 transition-all duration-500 hover:scale-105 bg-gradient-to-r from-[#3B82F6] via-[#1e3a8a] to-[#3B82F6] bg-[length:200%_auto] hover:bg-[position:right_center] uppercase text-xs tracking-wider"
+                      onClick={() => window.open("https://wa.me/212600000000", "_blank")}
+                      className="text-white px-5 py-3 rounded-xl font-black cursor-pointer shadow-xl active:scale-95 transition-all duration-500 hover:scale-105 bg-gradient-to-r from-[#3B82F6] via-[#1e3a8a] to-[#3B82F6] bg-[length:200%_auto] hover:bg-[position:right_center] uppercase text-[11px] tracking-wider"
                     >
                       {locale === 'en' ? 'Subscribe Now' : "S'abonner maintenant"}
                     </button>
                     
                     <button 
                       onClick={() => setIsMuted(prev => !prev)} 
-                      className="p-3 bg-black/60 backdrop-blur-xl border border-white/20 rounded-xl hover:bg-[#3B82F6] transition-all active:scale-95 shadow-xl cursor-pointer"
+                      aria-label={isMuted ? "Unmute video" : "Mute video"}
+                      className="p-2.5 bg-black/60 backdrop-blur-xl border border-white/20 rounded-xl hover:bg-[#3B82F6] transition-all active:scale-95 shadow-xl cursor-pointer"
                     >
-                      <span className="text-lg flex items-center justify-center h-5 w-5">
+                      <span className="text-base flex items-center justify-center h-4 w-4">
                         {isMuted ? "🔇" : "🔊"}
                       </span>
                     </button>
@@ -984,14 +991,15 @@ const slides = locale === 'en' ? [
               </div>
             ))}
           </div>
-          {/* النقط (Dots) للـ تيليفون بوحدو */}
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[90] flex lg:hidden items-center gap-2.5 bg-black/20 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/5 pointer-events-auto">
+
+          {/* 🎯 حركنا النقط (Dots) طالعين بـ bottom-4 عوض bottom-6 باش يبانو مجموعين مع السلايدر */}
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-[90] flex lg:hidden items-center gap-2 bg-black/20 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/5 pointer-events-auto">
             {slides.map((_, i) => (
               <button
                 key={i}
                 onClick={() => setCurrentSlide(i)}
-                className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
-                  currentSlide === i ? "w-6 bg-[#3B82F6]" : "w-2 bg-white/40 hover:bg-white/70"
+                className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                  currentSlide === i ? "w-5 bg-[#3B82F6]" : "w-1.5 bg-white/40 hover:bg-white/70"
                 }`}
                 aria-label={`Go to slide ${i + 1}`}
               />
