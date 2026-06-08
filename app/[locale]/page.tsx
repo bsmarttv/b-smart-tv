@@ -428,7 +428,7 @@ function PricingSection() {
           __observer.disconnect();
         }
       },
-      { threshold: 0.2 }
+      { threshold: 0.05 }
     );
     if (sectionRef.current) __observer.observe(sectionRef.current);
     return () => __observer.disconnect();
@@ -794,13 +794,15 @@ function HomeContent() {
       id: 1,
       h1: <>Best <span className="text-[#3B82F6]">IPTV Subscription 2026</span> <br/> Watch Live TV, Movies and Sports in HD</>,
       p: <>Enjoy an ultra-smooth <span className="text-[#3B82F6]">4K</span> streaming and <span className="text-[#3B82F6]">buffer-free</span> experience on all your devices, wherever you are.</>,
+      tag: "TV-EU",
       poster: "https://res.cloudinary.com/ddskjurfk/image/upload/v1780828302/hero-bg_w9ebsk.webp"
     },
     {
       id: 2,
       h1: <>The Latest Featured<br/> Movies & Series!</>,
       p: <>With <span className="text-[#3B82F6]">Strong IPTV</span> , dive into limitless entertainment: over 28,000 live channels and a rich catalog of 200,000 movies and series worldwide, with <span className="text-[#3B82F6]">100% guaranteed stability.</span></>,
-      tag: "TV-EU", video: "https://res.cloudinary.com/ddskjurfk/video/upload/f_auto,q_auto/v1780506742/watching-together-family_kjtfsh.mp4",
+      tag: "TV-EU",
+      video: "https://res.cloudinary.com/ddskjurfk/video/upload/f_auto,q_auto/v1780506742/watching-together-family_kjtfsh.mp4",
     },
     {
       id: 3,
@@ -813,6 +815,7 @@ function HomeContent() {
       id: 1,
       h1: <>Meilleur abonnement <span className="text-[#3B82F6]" ><br/> IPTV 2026</span> <br/> Regardez la télévision en direct, des films et du sport en HD</>,
       p: <>Profitez d'un streaming <span className="text-[#3B82F6]">4K</span> ultra-fluide et <span className="text-[#3B82F6]">sans coupure</span> sur tous vos appareils, où que vous soyez.</>,
+      tag: "TV-EU",
       poster: "https://res.cloudinary.com/ddskjurfk/image/upload/v1780828302/hero-bg_w9ebsk.webp"
     },
     {
@@ -896,14 +899,14 @@ function HomeContent() {
                   </h1>
                   
                   <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5 mb-3 text-[11px] md:text-sm font-medium w-full">
-                    <span className="text-yellow-400 font-bold text-sm whitespace-nowrap">⭐ 8.5</span>
+                    <span className="text-yellow-400 font-bold text-2xs whitespace-nowrap">⭐ 8.5</span>
                     <span className="text-[#94A3B8]">•</span>
-                    <span className="text-[#FFF] font-bold text-xs whitespace-nowrap">2026</span>
+                    <span className="text-[#FFF] font-bold text-2xs whitespace-nowrap">2026</span>
                     <span className="text-[#94A3B8]">•</span>
-                    <span className="text-[#FFF] font-bold text-xs whitespace-nowrap">
+                    <span className="text-[#FFF] font-bold text-2xs whitespace-nowrap">
                       {locale === 'en' ? 'Free Update' : 'Mise à jour gratuite'}
                     </span>
-                    <span className="bg-[#3B82F6]/10 text-[#3B82F6] px-2 py-0.5 rounded-md border border-[#3B82F6]/20 font-bold uppercase text-[8px] ml-1">
+                    <span className="bg-[#3B82F6]/10 text-[#3B82F6] px-1.5 py-1 rounded-md border border-[#3B82F6]/20 font-bold uppercase text-[13px] ml-1">
                       {slide.tag}
                     </span>
                   </div>
@@ -1008,7 +1011,7 @@ function HomeContent() {
 {/* WhatsApp Button */}
         <div className="fixed bottom-6 right-6 z-[90] transform-gpu transition-all duration-300">
           <button
-            onClick={() => window.open("https://wa.me/212600000000?text=Bonjour, je souhaite un test IPTV gratuit", "_blank")}
+            onClick={() => window.open("https://wa.me/447723340014?text=Bonjour, je souhaite un test IPTV gratuit", "_blank")}
             aria-label="Contact us on WhatsApp"
             className="flex items-center justify-center bg-[#25D366] text-white p-4 rounded-full shadow-[0_4px_20px_rgba(37,211,102,0.4)] hover:bg-[#20ba5a] hover:scale-110 active:scale-95 transition-all duration-300 cursor-pointer w-14 h-14 md:w-16 md:h-16"
           >

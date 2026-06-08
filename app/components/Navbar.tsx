@@ -82,41 +82,45 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-[100] bg-[#050505]/80 backdrop-blur-md border-b border-white/5 px-4 md:px-10 lg:px-20 py-4 flex items-center justify-between">
+    <nav className="fixed top-0 left-0 right-0 z-[100] bg-[#050505]/80 backdrop-blur-md border-b border-white/5 px-4 md:px-10 lg:px-20 py-4 flex items-center justify-between gap-4">
         
-        <Link href={`/${locale}`} prefetch={false} className="text-xl md:text-2xl font-black tracking-tighter italic text-[#3B82F6] flex items-center gap-1.5">
+        {/* 1. الـ Logo - 🎯 زدنا flex-shrink-0 باش مستحيل يتزير أو يقيسو شي رابط */}
+        <Link href={`/${locale}`} prefetch={false} className="flex-shrink-0 text-xl md:text-2xl font-black tracking-tighter italic text-[#3B82F6] flex items-center gap-1.5">
           <span className="border-2 border-[#3B82F6] p-1 rounded-md text-xs font-bold">TV</span>
           B-SMART<span className="text-white">TV</span>
         </Link>
 
-        <div className="hidden md:flex items-center gap-8 text-[12px] font-bold uppercase tracking-[0.2em] text-white/90">
-          <Link href={`/${locale}`} prefetch={false} className="relative group text-[#94A3B8] hover:text-white transition duration-300 cursor-pointer">
+        {/* 2. الـ الروابط (Links) - 🎯 هادا هو التعديل الأساسي! */}
+        {/* زدنا mx-auto باش يشد الوسط نيشاان، و gap-x-6 أو gap-x-8 على حسب عرض الشاشة، و whitespace-nowrap باش الكلمات ما يتهرسوش */}
+        <div className="hidden md:flex items-center justify-center gap-x-6 lg:gap-x-8 mx-auto text-[12px] font-bold uppercase tracking-[0.2em] text-white/90">
+          <Link href={`/${locale}`} prefetch={false} className="relative group text-[#94A3B8] hover:text-white transition duration-300 cursor-pointer whitespace-nowrap">
             {locale === 'en' ? 'Home' : 'Accueil'}
             <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-[#3B82F6] transition-all duration-300 group-hover:w-full"></span>
           </Link>
-          <Link href={`/${locale}/nos-chaines`} prefetch={false} className="relative group text-[#94A3B8] hover:text-white transition duration-300 cursor-pointer">
+          <Link href={`/${locale}/nos-chaines`} prefetch={false} className="relative group text-[#94A3B8] hover:text-white transition duration-300 cursor-pointer whitespace-nowrap">
             {locale === 'en' ? 'Our Channels' : 'Nos chaînes'}
             <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-[#3B82F6] transition-all duration-300 group-hover:w-full"></span>
           </Link>
-          <Link href={`/${locale}/revendeur`} prefetch={false} className="relative group text-[#94A3B8] hover:text-white transition duration-300 cursor-pointer">
+          <Link href={`/${locale}/revendeur`} prefetch={false} className="relative group text-[#94A3B8] hover:text-white transition duration-300 cursor-pointer whitespace-nowrap">
             {locale === 'en' ? 'Reseller' : 'Revendeur'}
             <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-[#3B82F6] transition-all duration-300 group-hover:w-full"></span>
           </Link>
-          <Link href={`/${locale}/installation`} prefetch={false} className="relative group text-[#94A3B8] hover:text-white transition duration-300 cursor-pointer">
+          <Link href={`/${locale}/installation`} prefetch={false} className="relative group text-[#94A3B8] hover:text-white transition duration-300 cursor-pointer whitespace-nowrap">
             Installation
             <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-[#3B82F6] transition-all duration-300 group-hover:w-full"></span>
           </Link>
-          <a href={`/${locale}#essai`} onClick={scrollToEssai} className="relative group text-[#94A3B8] hover:text-white transition duration-300 cursor-pointer">
+          <a href={`/${locale}#essai`} onClick={scrollToEssai} className="relative group text-[#94A3B8] hover:text-white transition duration-300 cursor-pointer whitespace-nowrap">
             Contact
             <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-[#3B82F6] transition-all duration-300 group-hover:w-full"></span>
           </a>
         </div>
 
-        <div className="flex items-center gap-4 relative z-[100010]">
+        {/* 3. الـ اليمين (Buttons + Dropdown) - 🎯 زدنا flex-shrink-0 لحماية المساحة */}
+        <div className="flex items-center gap-4 relative z-[100010] flex-shrink-0">
           
           <button 
             onClick={scrollToEssai}
-            className="hidden md:block text-white px-4 py-2.5 rounded-xl font-black cursor-pointer shadow-xl active:scale-95 transition-all duration-500 hover:scale-105 bg-gradient-to-r from-[#3B82F6] via-[#1e3a8a] to-[#3B82F6] bg-[length:200%_auto] hover:bg-[position:right_center] uppercase text-xs tracking-wider"
+            className="hidden md:block text-white px-4 py-2.5 rounded-xl font-black cursor-pointer shadow-xl active:scale-95 transition-all duration-500 hover:scale-105 bg-gradient-to-r from-[#3B82F6] via-[#1e3a8a] to-[#3B82F6] bg-[length:200%_auto] hover:bg-[position:right_center] uppercase text-xs tracking-wider whitespace-nowrap"
           >
             Test IPTV
           </button>
@@ -198,7 +202,7 @@ export default function Navbar() {
               </div>
 
               <div className="flex flex-col px-6 w-full text-left font-bold text-[12px] uppercase tracking-widest text-white/90 mt-2">
-                <Link href={`/${locale}`} prefetch={false} onClick={() => setIsOpen(false)} className="py-4 border-b border-white/5 hover:text-[#3B82F6] transition-colors w-full block">
+                <Link href={`/${locale}`} prefetch={false} onClick={() => setIsOpen(false)} className="py-4 border-b border-white/5git add . hover:text-[#3B82F6] transition-colors w-full block">
                   {locale === 'en' ? 'HOME' : 'ACCUEIL'}
                 </Link>
                 <Link href={`/${locale}/nos-chaines`} prefetch={false} onClick={() => setIsOpen(false)} className="py-4 border-b border-white/5 hover:text-[#3B82F6] transition-colors w-full block">
