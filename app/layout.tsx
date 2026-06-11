@@ -38,21 +38,21 @@ export default function RootLayout({
         {/* المحتوى د السيت */}
         <main className="flex-grow pt-[72px]">{children}</main>
 
-        {/* 1️⃣ 🚀 السحر هنا: زدنا الـ Google Analytics باش يقرا الـ ID د Vercel نيشان */}
+        {/* 🎯 مسمار كوكل أدس الجديد المـستهدف لبلجيكا */}
         <Script
-          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}`}
+          src="https://www.googletagmanager.com/gtag/js?id=AW-18223390926"
           strategy="afterInteractive"
         />
-        <Script id="google-analytics" strategy="afterInteractive">
+        <Script id="google-ads-tag" strategy="afterInteractive">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', '${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}');
+            gtag('config', 'AW-18223390926');
           `}
         </Script>
 
-        {/* 2️⃣ التاغ مانجر الذكي (ديال القديم بقى بلاصتو ناضي) */}
+        {/* الـ التاغ مانجر القديم ديالك خليناه ف التيـساع بلاصتو */}
         <Script
           id="gtm-script"
           strategy="afterInteractive"
