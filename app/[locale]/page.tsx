@@ -621,7 +621,7 @@ function PricingSection() {
                 
                 <div className="w-full lg:w-1/2 grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1.5">
                   {trialFeatures.map((feat, i) => (
-                    <div key={i} className="flex items-center gap-2 border-white/5 pb-1">
+                    <div key={i} className="flex items-center gap-2 border-b border-white/5 pb-1">
                       <svg className="w-3.5 h-3.5 text-white flex-shrink-0 bg-[#3B82F6] rounded-full p-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path d="M5 13l4 4L19 7" />
                       </svg>

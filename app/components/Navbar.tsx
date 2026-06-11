@@ -202,7 +202,7 @@ export default function Navbar() {
               </div>
 
               <div className="flex flex-col px-6 w-full text-left font-bold text-[12px] uppercase tracking-widest text-white/90 mt-2">
-                <Link href={`/${locale}`} prefetch={false} onClick={() => setIsOpen(false)} className="py-4 border-b border-white/5git add . hover:text-[#3B82F6] transition-colors w-full block">
+                <Link href={`/${locale}`} prefetch={false} onClick={() => setIsOpen(false)} className="py-4 border-b border-white/5 hover:text-[#3B82F6] transition-colors w-full block">
                   {locale === 'en' ? 'HOME' : 'ACCUEIL'}
                 </Link>
                 <Link href={`/${locale}/nos-chaines`} prefetch={false} onClick={() => setIsOpen(false)} className="py-4 border-b border-white/5 hover:text-[#3B82F6] transition-colors w-full block">
