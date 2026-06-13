@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/Navbar";
 import Script from "next/script";
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,7 +32,7 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-[#050505] text-white">
+   <body className="min-h-full flex flex-col bg-[#050505] text-white">
         {/* الـ Navbar ديالك */}
         <Navbar />
         
@@ -58,6 +59,9 @@ export default function RootLayout({
           strategy="afterInteractive"
           src="https://www.googletagmanager.com/gtm.js?id=GTM-NX7Z2G4Z"
         />
+
+        {/* ⚡ المراقبة الذكية لسرعة السيت من Vercel */}
+        <SpeedInsights />
       </body>
     </html>
   );
