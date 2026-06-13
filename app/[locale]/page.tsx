@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic'; 
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import ReactDOM from 'react-dom';
 
 // ─── UNIFIED SECTION (SLIDER + IMAGE ON THE RIGHT) ───
 function UnifiedSection() {
@@ -850,7 +851,7 @@ function HomeContent() {
 
   const nextSlide = () => setCurrentSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
   const prevSlide = () => setCurrentSlide((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
-
+  ReactDOM.preload('https://res.cloudinary.com/ddskjurfk/image/upload/v1780828302/hero-bg_w9ebsk.webp', { as: 'image' });
   return (
     <div suppressHydrationWarning className="bg-[#050505] min-h-screen font-sans selection:bg-[#3B82F6] text-white overflow-x-hidden w-full relative">
       <div className="w-full">
