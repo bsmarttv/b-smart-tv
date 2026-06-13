@@ -32,7 +32,7 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-   <body className="min-h-full flex flex-col bg-[#050505] text-white">
+      <body className="min-h-full flex flex-col bg-[#050505] text-white">
         {/* الـ Navbar ديالك */}
         <Navbar />
         
@@ -53,12 +53,28 @@ export default function RootLayout({
           `}
         </Script>
 
-        {/* الـ التاغ مانجر القديم ديالك خليناه ف التيـساع بلاصتو */}
-     <Script
-  id="gtm-script"
-  strategy="lazyOnload" // <--- رجّـعـهـا هـكـذا بـاش الـ مـتـصـفِّـح يـبـقـى خـفـيـف ومـا يـتـبـلـوكـاش
-  src="https://www.googletagmanager.com/gtm.js?id=GTM-NX7Z2G4Z"
-/>
+        {/* الـ التاغ مانجر القديم ديالك رجعناه lazyOnload باش يخفاف السيت */}
+        <Script
+          id="gtm-script"
+          strategy="lazyOnload"
+          src="https://www.googletagmanager.com/gtm.js?id=GTM-NX7Z2G4Z"
+        />
+
+        {/* 📊 1️⃣ الـ سِّـكـريـپـت الـأوّل د الـ StatCounter (ربطناه بالـ window نيشَان بـاش يـقراه الـ سِّيسـتـم) */}
+        <Script id="statcounter-config" strategy="afterInteractive">
+          {`
+            window.sc_project = 13295746; 
+            window.sc_invisible = 1; 
+            window.sc_security = "becd70df";
+          `}
+        </Script>
+
+        {/* 📊 2️⃣ الـ مـلـف الـرَّئـيـسـي د الـ StatCounter لـلّـي كـايـعـيِّـط لـ الـ سِّـيرْفـر */}
+        <Script
+          id="statcounter-main"
+          strategy="afterInteractive"
+          src="https://www.statcounter.com/counter/counter.js"
+        />
 
         {/* ⚡ المراقبة الذكية لسرعة السيت من Vercel */}
         <SpeedInsights />
