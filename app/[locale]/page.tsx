@@ -12,7 +12,7 @@ function UnifiedSection() {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
 
-  const postersData = ["11.png","12.png", "13.png","14.png","15.png"];
+  const postersData = ["11.webp","12.webp", "13.webp","14.webp","15.webp"];
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -851,8 +851,7 @@ function HomeContent() {
 
   const nextSlide = () => setCurrentSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
   const prevSlide = () => setCurrentSlide((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
-  ReactDOM.preload('https://res.cloudinary.com/ddskjurfk/image/upload/v1780828302/hero-bg_w9ebsk.webp', { as: 'image' });
-  return (
+ReactDOM.preload('https://res.cloudinary.com/ddskjurfk/image/upload/v1780828302/hero-bg_w9ebsk.webp', { as: 'image', fetchPriority: 'high' as any });  return (
     <div suppressHydrationWarning className="bg-[#050505] min-h-screen font-sans selection:bg-[#3B82F6] text-white overflow-x-hidden w-full relative">
       <div className="w-full">
         <header className="relative w-full overflow-hidden min-h-[580px] sm:min-h-[650px] md:min-h-[650px] lg:min-h-[700px] flex items-center bg-[#050505]">
