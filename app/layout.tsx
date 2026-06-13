@@ -54,11 +54,11 @@ export default function RootLayout({
         </Script>
 
         {/* الـ التاغ مانجر القديم ديالك خليناه ف التيـساع بلاصتو */}
-        <Script
-          id="gtm-script"
-          strategy="afterInteractive"
-          src="https://www.googletagmanager.com/gtm.js?id=GTM-NX7Z2G4Z"
-        />
+     <Script
+  id="gtm-script"
+  strategy="lazyOnload" // <--- رجّـعـهـا هـكـذا بـاش الـ مـتـصـفِّـح يـبـقـى خـفـيـف ومـا يـتـبـلـوكـاش
+  src="https://www.googletagmanager.com/gtm.js?id=GTM-NX7Z2G4Z"
+/>
 
         {/* ⚡ المراقبة الذكية لسرعة السيت من Vercel */}
         <SpeedInsights />
